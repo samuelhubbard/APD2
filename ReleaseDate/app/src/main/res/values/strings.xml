@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">Release Date</string>
+    <string name="tracked_activity_title">Tracked Games</string>
+    <string name="upcoming_activity_title">Upcoming Games</string>
+    <string name="about_activity_title">About Release Date</string>
 </resources>
