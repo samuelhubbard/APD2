@@ -11,9 +11,8 @@
     android:background="@color/colorPrimaryDark"
     tools:context="com.samuelhubbard.android.releasedate.TrackedGamesActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#ffffff"
-        android:text="Tracked Games List View Goes Here!" />
+    <FrameLayout android:id="@+id/tracked_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 </LinearLayout>

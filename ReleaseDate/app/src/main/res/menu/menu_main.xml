@@ -3,8 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.samuelhubbard.android.mappingphotos.MainActivity">
 
-    <item android:title="Add"
+    <item android:title="Upcoming Games"
         android:id="@+id/action_upcoming"
+        android:icon="@drawable/ic_action_upcoming"
         android:orderInCategory="100"
         app:showAsAction="ifRoom" />
 
