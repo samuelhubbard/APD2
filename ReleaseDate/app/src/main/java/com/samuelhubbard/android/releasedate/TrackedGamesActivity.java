@@ -1,3 +1,6 @@
+// Release Date
+// Samuel Hubbard
+
 package com.samuelhubbard.android.releasedate;
 
 import android.content.Context;
@@ -18,12 +21,15 @@ public class TrackedGamesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tracked_games);
+        setTitle(R.string.tracked_activity_title);
 
+        // check to see if the device is online
         ConnectivityManager manager = (ConnectivityManager)
                 getSystemService(Context.CONNECTIVITY_SERVICE);
 
         boolean isConnected = VerifyConnection.checkNetwork(manager, this);
 
+        // if it is... give toast alerts... for now
         if (isConnected) {
             Toast.makeText(this, "Connected to the Internet", Toast.LENGTH_SHORT).show();
         } else {
@@ -32,7 +38,6 @@ public class TrackedGamesActivity extends AppCompatActivity {
 
         // hang the fragment
         if (savedInstanceState == null) {
-            //TODO: Hang the fragment
             TrackedGamesFragment trackedFrag = TrackedGamesFragment.newInstance();
             getFragmentManager().beginTransaction()
                     .replace(R.id.tracked_container, trackedFrag, TrackedGamesFragment.TAG)
@@ -51,13 +56,14 @@ public class TrackedGamesActivity extends AppCompatActivity {
         // pull which item was tapped
         int id = item.getItemId();
 
-        //TODO: Add navigation to other activities
+        // open the upcoming games activity
         if (id == R.id.action_upcoming) {
             Intent i = new Intent(this, UpcomingGamesActivity.class);
             startActivityForResult(i, 0);
             return true;
         }
 
+        // open the about app activity
         if (id == R.id.action_about) {
             Intent i = new Intent(this, AboutAppActivity.class);
             startActivity(i);

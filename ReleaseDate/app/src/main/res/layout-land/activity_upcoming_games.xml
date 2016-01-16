@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:background="@color/colorPrimaryDark">
 
     <ProgressBar android:id="@+id/progress_indicator"
@@ -13,14 +13,14 @@
         android:layout_height="80dp" />
 
     <FrameLayout android:id="@+id/upcoming_filters_container"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:visibility="gone"
-        android:layout_height="0dp"
-        android:layout_weight=".1" />
+        android:layout_height="match_parent"
+        android:layout_weight=".3" />
 
     <FrameLayout android:id="@+id/upcoming_games_container"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:visibility="gone"
-        android:layout_height="0dp"
-        android:layout_weight=".9" />
+        android:layout_height="match_parent"
+        android:layout_weight=".7" />
 </LinearLayout>

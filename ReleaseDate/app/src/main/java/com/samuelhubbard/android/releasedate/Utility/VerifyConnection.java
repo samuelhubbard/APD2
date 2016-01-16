@@ -1,12 +1,12 @@
+// Release Date
+// Samuel Hubbard
+
 package com.samuelhubbard.android.releasedate.Utility;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-/**
- * Created by samuelhubbard on 1/14/16.
- */
 public class VerifyConnection {
 
     // member variables

@@ -1,3 +1,6 @@
+// Release Date
+// Samuel Hubbard
+
 package com.samuelhubbard.android.releasedate.Fragments;
 
 import android.app.Fragment;
@@ -9,19 +12,19 @@ import android.view.ViewGroup;
 
 import com.samuelhubbard.android.releasedate.R;
 
-/**
- * Created by samuelhubbard on 1/14/16.
- */
 public class AboutAppFragment extends Fragment {
 
+    // the fragment identification tag
     public static final String TAG = "AboutAppFragment.TAG";
 
+    // starting a new fragment
     public static AboutAppFragment newInstance() {
         AboutAppFragment f = new AboutAppFragment();
 
         return f;
     }
 
+    // inflate the fragment's view
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

@@ -1,3 +1,6 @@
+// Release Date
+// Samuel Hubbard
+
 package com.samuelhubbard.android.releasedate;
 
 import android.os.Bundle;
@@ -13,6 +16,7 @@ public class AboutAppActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
 
+        // hang the fragment
         if (savedInstanceState == null) {
             AboutAppFragment aboutFrag = AboutAppFragment.newInstance();
             getFragmentManager().beginTransaction()
