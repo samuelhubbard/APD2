@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.samuelhubbard.android.releasedate.ListViewElements.GameListAdapter;
@@ -17,6 +18,7 @@ import com.samuelhubbard.android.releasedate.ListViewElements.GameListObject;
 import com.samuelhubbard.android.releasedate.R;
 
 import java.util.ArrayList;
+import java.util.IllegalFormatCodePointException;
 
 public class UpcomingGamesFragment extends Fragment {
 
@@ -25,6 +27,12 @@ public class UpcomingGamesFragment extends Fragment {
 
     // the list view
     private ListView gameListView;
+
+    private UpcomingGamesInterface mInterface;
+
+    public interface UpcomingGamesInterface {
+        void openGameDetails(String id);
+    }
 
     // start a new fragment
     public static UpcomingGamesFragment newInstance() {
@@ -40,6 +48,17 @@ public class UpcomingGamesFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_upcoming_games, container, false);
 
         return v;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        if (context instanceof UpcomingGamesInterface) {
+            mInterface = (UpcomingGamesInterface) getActivity();
+        } else {
+            throw new IllegalArgumentException("Interface must be an instance of the context.");
+        }
     }
 
     // link the list view to the layout
@@ -58,6 +77,18 @@ public class UpcomingGamesFragment extends Fragment {
 
         // sets the list view to the custom adapter
         gameListView.setAdapter(gameListAdapter);
+
+        gameListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                GameListObject game = (GameListObject) parent.getAdapter().getItem(position);
+
+                mInterface = (UpcomingGamesInterface) getActivity();
+
+                mInterface.openGameDetails(game.getGameId());
+
+            }
+        });
 
     }
 

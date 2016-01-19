@@ -4,6 +4,7 @@
 package com.samuelhubbard.android.releasedate;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -24,7 +25,7 @@ import com.samuelhubbard.android.releasedate.Utility.VerifyConnection;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class UpcomingGamesActivity extends AppCompatActivity {
+public class UpcomingGamesActivity extends AppCompatActivity implements UpcomingGamesFragment.UpcomingGamesInterface {
 
     // variables for game retrieval
     String mYear;
@@ -144,6 +145,13 @@ public class UpcomingGamesActivity extends AppCompatActivity {
                 f.createList(this, mArray);
             }
         }
+    }
+
+    @Override
+    public void openGameDetails(String id) {
+        Intent i = new Intent(this, UpcomingGameDetailActivity.class);
+        i.putExtra("ID", id);
+        startActivity(i);
     }
 
     private class RetrieveUpcomingGames extends AsyncTask<Void, Void, ArrayList<GameListObject>> {

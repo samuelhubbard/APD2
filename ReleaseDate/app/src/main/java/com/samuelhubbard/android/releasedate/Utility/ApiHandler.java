@@ -4,6 +4,7 @@
 package com.samuelhubbard.android.releasedate.Utility;
 
 import com.samuelhubbard.android.releasedate.ListViewElements.GameListObject;
+import com.samuelhubbard.android.releasedate.ListViewElements.GameObject;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
@@ -24,7 +25,9 @@ public class ApiHandler {
     // API URL elements
     // Just a note, this looks complicated but now I will be able to piece together the url for
     // a multitude of different possible scenarios (which this app has)
-    private static final String URL_BASE = "http://www.giantbomb.com/api/games/";
+    private static final String URL_BASE = "http://www.giantbomb.com/api/";
+    private static final String MULTIPLE_GAMES = "games/";
+    private static final String GAME_DETAIL = "game/";
     private static final String API_KEY = "?api_key=50e1bd0527eca552647ed32ebe50f7bb8ee0e89e";
     private static final String API_FORMAT = "&format=json";
     private static final String API_FILTER_STARTER = "&filter=";
@@ -36,7 +39,7 @@ public class ApiHandler {
     public static String retrieveUpcomingGames(String year, String quarter) {
 
         // constructing the API Url
-        String urlString = URL_BASE + API_KEY + API_FORMAT + API_FILTER_STARTER + API_FILTER_YEAR
+        String urlString = URL_BASE + MULTIPLE_GAMES + API_KEY + API_FORMAT + API_FILTER_STARTER + API_FILTER_YEAR
                 + year + API_FILTER_SEP + API_FILTER_QUARTER + quarter + API_FILTER_SEP + API_APP_TRACKED_PLATFORMS;
 
         // try/catch - pull data from the API
@@ -51,11 +54,11 @@ public class ApiHandler {
             connection.connect();
 
             // start an input stream and put the contents into a string
-            InputStream weatherStream = connection.getInputStream();
-            String data = IOUtils.toString(weatherStream);
+            InputStream gameStream = connection.getInputStream();
+            String data = IOUtils.toString(gameStream);
 
             // close the stream and disconnect from the server
-            weatherStream.close();
+            gameStream.close();
             connection.disconnect();
 
             // return the string that holds the JSON
@@ -283,6 +286,144 @@ public class ApiHandler {
             }
             return sortedArray;
 
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static String retrieveGameDetail(String id) {
+
+        // http://www.giantbomb.com/api/game/" + selectedGame + "/?api_key=50e1bd0527eca552647ed32ebe50f7bb8ee0e89e&format=json
+
+        String urlString = URL_BASE + GAME_DETAIL + id + API_KEY + API_FORMAT;
+
+        try {
+            // cast the URL string into a URL
+            URL url = new URL(urlString);
+
+            // open the connection
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+            // connect to the server
+            connection.connect();
+
+            // start an input stream and put the contents into a string
+            InputStream gameStream = connection.getInputStream();
+            String data = IOUtils.toString(gameStream);
+
+            // close the stream and disconnect from the server
+            gameStream.close();
+            connection.disconnect();
+
+            // return the string that holds the JSON
+            return data;
+
+            // if there was an issue, print the stack trace
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // if there was an issue, return null
+        return null;
+
+    }
+
+    public static GameObject parseGame(String raw) {
+
+        try {
+            JSONObject data = new JSONObject(raw);
+
+            JSONObject results = data.getJSONObject("results");
+
+            JSONObject image = null;
+
+            // if the actual object inside of the json isn't null
+            if (!results.isNull("image")) {
+                // set the image JSONObject to the image object inside the JSON
+                image = results.getJSONObject("image");
+            }
+
+            // link to the platforms array inside of the game object
+            JSONArray jsonPlatforms = results.getJSONArray("platforms");
+            JSONArray jsonDevelopers = results.getJSONArray("developers");
+            JSONArray jsonGenres = results.getJSONArray("genres");
+
+            // initialize the string that will hold all of the available platforms
+            String workingPlatforms = "";
+
+            // for loop through the platform array
+            for (int p = 0; p < jsonPlatforms.length(); p++) {
+                // link a jason object to the current position of the platform array
+                JSONObject singlePlatform = jsonPlatforms.getJSONObject(p);
+
+                // as long as the platform is being tracked by this app, add it to the string
+                if (Objects.equals(singlePlatform.getString("name"), "PC") ||
+                        Objects.equals(singlePlatform.getString("name"), "PlayStation 4") ||
+                        Objects.equals(singlePlatform.getString("name"), "Xbox One") ||
+                        Objects.equals(singlePlatform.getString("name"), "Wii U")) {
+                    workingPlatforms = workingPlatforms + singlePlatform.getString("name") + ", ";
+                }
+            }
+
+            String workingDevelopers = "";
+
+            for (int p = 0; p < jsonDevelopers.length(); p++) {
+                // link a jason object to the current position of the platform array
+                JSONObject singleDeveloper = jsonDevelopers.getJSONObject(p);
+
+                workingDevelopers = workingDevelopers + singleDeveloper.getString("name") + ", ";
+            }
+
+            String workingGenres = "";
+
+            for (int p = 0; p < jsonGenres.length(); p++) {
+                // link a jason object to the current position of the platform array
+                JSONObject singleGenre = jsonGenres.getJSONObject(p);
+
+                workingGenres = workingGenres + singleGenre.getString("name") + ", ";
+            }
+
+            // get the game name
+            String name = results.getString("name");
+
+            String description = results.getString("deck");
+
+            String detailImage;
+            if (image != null) {
+                detailImage = image.getString("small_url");
+            } else {
+                detailImage = "no_image";
+            }
+
+            // get the release date and quarter in pieces
+            String day = results.getString("expected_release_day");
+            String month = results.getString("expected_release_month");
+            String year = results.getString("expected_release_year");
+
+            // remove all of the extra spaces and commas from the platform string
+            String platforms = workingPlatforms;
+            if (platforms.endsWith(", ")) {
+                platforms = platforms.substring(0, platforms.length() - 2);
+            }
+
+            String developers = workingDevelopers;
+            if (developers.endsWith(", ")) {
+                developers = developers.substring(0, developers.length() - 2);
+            }
+
+            String genres = workingGenres;
+            if (genres.endsWith(", ")) {
+                genres = genres.substring(0, genres.length() - 2);
+            }
+
+            String id = results.getString("id");
+
+            GameObject game = new GameObject(name, description, day, month, year, platforms, detailImage, developers,
+                    genres, id);
+
+            return game;
         } catch (JSONException e) {
             e.printStackTrace();
         }

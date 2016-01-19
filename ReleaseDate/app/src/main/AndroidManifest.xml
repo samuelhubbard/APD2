@@ -30,6 +30,12 @@
             android:parentActivityName=".TrackedGamesActivity">
 
         </activity>
+
+        <activity android:name=".UpcomingGameDetailActivity"
+            android:label="@string/game_detail_activity_title"
+            android:parentActivityName=".UpcomingGamesActivity">
+
+        </activity>
     </application>
 
 </manifest>
