@@ -11,4 +11,12 @@
 
     <string name="about_screen_content1">Release Date is an app that will track video game release dates for all of the current generation consoles and PC. It will display all of the upcoming games with CONFIRMED release dates. You can view content about the game and choose to track it. It will then remind you when that release date is coming up because we all know life is too busy. The app will also continually check to see if any of the games that you are tracking have had their release date changed. As gamers, we all know that developers and publishers will often times have to push back the release to a game.\n\nIf you can’t see the video game you are looking for, that’s probably because it doesn’t have a confirmed release date yet. Keep checking back every so often.</string>
     <string name="about_screen_content2">This app was developed by Samuel Hubbard (that’s me). However, there are certain aspects to the app that I would not have been able to do on my own.\n\nSo, here is a list of all outside sources that I used to either make the app possible or, at the very least, less of a headache to develop:\n\nGiant Bomb - This is where all of the video game information is coming from. They are the ones who actually keep up with all of the information for the games.\n\nPicasso (tentative) - Without this addition, loading images from the internet would have been a much larger headache.\n\nApache IOUtils - Makes pulling in the API data so much easier.</string>
+
+    <string name="detail_screen_summary_title">Summary</string>
+    <string name="detail_screen_gallery_title">Images</string>
+
+    <string name="no_tracked_games">Not currently tracking and games.\nGo find some!</string>
+
+    <string name="tracked_game">Game added!</string>
+    <string name="failed_to_track_game">Something went wrong</string>
 </resources>

@@ -3,10 +3,10 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:text="Image"
-        android:textColor="@color/colorAccent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <ImageView android:id="@+id/detail_image"
+        android:layout_gravity="center"
+        android:scaleType="fitXY"
+        android:layout_width="125dp"
+        android:layout_height="200dp" />
 
 </LinearLayout>

@@ -347,8 +347,16 @@ public class ApiHandler {
 
             // link to the platforms array inside of the game object
             JSONArray jsonPlatforms = results.getJSONArray("platforms");
-            JSONArray jsonDevelopers = results.getJSONArray("developers");
-            JSONArray jsonGenres = results.getJSONArray("genres");
+            JSONArray jsonDevelopers = null;
+            JSONArray jsonGenres = null;
+
+            if (!results.isNull("genres")) {
+                jsonGenres = results.getJSONArray("genres");
+            }
+
+            if (!results.isNull("developers")) {
+                jsonDevelopers = results.getJSONArray("developers");
+            }
 
             // initialize the string that will hold all of the available platforms
             String workingPlatforms = "";
@@ -369,20 +377,28 @@ public class ApiHandler {
 
             String workingDevelopers = "";
 
-            for (int p = 0; p < jsonDevelopers.length(); p++) {
-                // link a jason object to the current position of the platform array
-                JSONObject singleDeveloper = jsonDevelopers.getJSONObject(p);
+            if (jsonDevelopers != null) {
+                for (int p = 0; p < jsonDevelopers.length(); p++) {
+                    // link a jason object to the current position of the platform array
+                    JSONObject singleDeveloper = jsonDevelopers.getJSONObject(p);
 
-                workingDevelopers = workingDevelopers + singleDeveloper.getString("name") + ", ";
+                    workingDevelopers = workingDevelopers + singleDeveloper.getString("name") + ", ";
+                }
+            } else {
+                workingDevelopers = "No developers listed.";
             }
 
             String workingGenres = "";
 
-            for (int p = 0; p < jsonGenres.length(); p++) {
-                // link a jason object to the current position of the platform array
-                JSONObject singleGenre = jsonGenres.getJSONObject(p);
+            if (jsonGenres != null) {
+                for (int p = 0; p < jsonGenres.length(); p++) {
+                    // link a jason object to the current position of the platform array
+                    JSONObject singleGenre = jsonGenres.getJSONObject(p);
 
-                workingGenres = workingGenres + singleGenre.getString("name") + ", ";
+                    workingGenres = workingGenres + singleGenre.getString("name") + ", ";
+                }
+            } else {
+                workingGenres = "No genres listed.";
             }
 
             // get the game name
@@ -392,7 +408,7 @@ public class ApiHandler {
 
             String detailImage;
             if (image != null) {
-                detailImage = image.getString("small_url");
+                detailImage = image.getString("medium_url");
             } else {
                 detailImage = "no_image";
             }

@@ -8,12 +8,18 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.samuelhubbard.android.releasedate.Fragments.TrackedGamesFragment;
+import com.samuelhubbard.android.releasedate.ListViewElements.GameObject;
+import com.samuelhubbard.android.releasedate.Utility.FileManager;
 import com.samuelhubbard.android.releasedate.Utility.VerifyConnection;
+
+import java.io.File;
+import java.util.ArrayList;
 
 public class TrackedGamesActivity extends AppCompatActivity {
 
@@ -22,6 +28,9 @@ public class TrackedGamesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tracked_games);
         setTitle(R.string.tracked_activity_title);
+
+        String filename = "trackedgames.bin";
+        ArrayList<GameObject> list = FileManager.loadFromFile(new File(this.getFilesDir(), filename));
 
         // check to see if the device is online
         ConnectivityManager manager = (ConnectivityManager)
@@ -38,11 +47,23 @@ public class TrackedGamesActivity extends AppCompatActivity {
 
         // hang the fragment
         if (savedInstanceState == null) {
-            TrackedGamesFragment trackedFrag = TrackedGamesFragment.newInstance();
+            TrackedGamesFragment trackedFrag = TrackedGamesFragment.newInstance(list, this);
             getFragmentManager().beginTransaction()
                     .replace(R.id.tracked_container, trackedFrag, TrackedGamesFragment.TAG)
                     .commit();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        TrackedGamesFragment f = (TrackedGamesFragment) getFragmentManager()
+                .findFragmentByTag(TrackedGamesFragment.TAG);
+
+        String filename = "trackedgames.bin";
+        ArrayList<GameObject> list = FileManager.loadFromFile(new File(this.getFilesDir(), filename));
+
+        f.updateList(list);
     }
 
     @Override
