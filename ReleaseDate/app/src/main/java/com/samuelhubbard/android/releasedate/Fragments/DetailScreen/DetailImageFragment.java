@@ -5,6 +5,7 @@ package com.samuelhubbard.android.releasedate.Fragments.DetailScreen;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import android.widget.ImageView;
 
 import com.samuelhubbard.android.releasedate.ListViewElements.GameObject;
 import com.samuelhubbard.android.releasedate.R;
+import com.samuelhubbard.android.releasedate.Utility.VerifyConnection;
 import com.squareup.picasso.Picasso;
 
 import java.util.Objects;
@@ -41,6 +43,7 @@ public class DetailImageFragment extends Fragment {
     }
 
     public void populateImage(GameObject game, Context c) {
+
         // run a check to see what came in
         if (Objects.equals(game.getImage(), "no_image")) {
             // no image from api, load the placeholder

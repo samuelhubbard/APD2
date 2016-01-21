@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -31,6 +32,12 @@ public class TrackedGamesFragment extends Fragment {
     private ArrayList<GameObject> mFinalArray;
     private static Context mContext;
 
+    private TrackedGamesInterface mInterface;
+
+    public interface TrackedGamesInterface {
+        void openDetails(GameObject game);
+    }
+
     // start a new fragment
     public static TrackedGamesFragment newInstance(ArrayList<GameObject> a, Context c) {
         TrackedGamesFragment f = new TrackedGamesFragment();
@@ -51,6 +58,15 @@ public class TrackedGamesFragment extends Fragment {
         mTrackedGamesList = (ListView) v.findViewById(R.id.tracked_list);
 
         return v;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        if (context instanceof TrackedGamesInterface) {
+            mInterface = (TrackedGamesInterface) getActivity();
+        }
     }
 
     @Override
@@ -78,6 +94,17 @@ public class TrackedGamesFragment extends Fragment {
         TrackedGameListAdapter adapter = new TrackedGameListAdapter(mContext, mFinalArray);
 
         mTrackedGamesList.setAdapter(adapter);
+
+        mTrackedGamesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                GameObject game = (GameObject) parent.getAdapter().getItem(position);
+
+                mInterface = (TrackedGamesInterface) getActivity();
+
+                mInterface.openDetails(game);
+            }
+        });
 
     }
 }

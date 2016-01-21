@@ -68,7 +68,7 @@ public class UpcomingGamesActivity extends AppCompatActivity implements Upcoming
         ConnectivityManager manager = (ConnectivityManager)
                 getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        boolean isConnected = VerifyConnection.checkNetwork(manager, this);
+        boolean isConnected = VerifyConnection.checkNetwork(manager);
 
         if (savedInstanceState == null) {
             // define the new array
@@ -151,6 +151,7 @@ public class UpcomingGamesActivity extends AppCompatActivity implements Upcoming
     public void openGameDetails(String id) {
         Intent i = new Intent(this, UpcomingGameDetailActivity.class);
         i.putExtra("ID", id);
+        i.putExtra("SENTFROM", "Upcoming");
         startActivity(i);
     }
 
@@ -182,7 +183,7 @@ public class UpcomingGamesActivity extends AppCompatActivity implements Upcoming
                     getSystemService(Context.CONNECTIVITY_SERVICE);
 
             // the boolean that checks for connectivity
-            boolean isConnected = VerifyConnection.checkNetwork(manager, UpcomingGamesActivity.this);
+            boolean isConnected = VerifyConnection.checkNetwork(manager);
 
             if(isConnected) {
                 // perform all of the required api calls for the timeframe requirement

@@ -13,7 +13,7 @@ public class VerifyConnection {
     private static ConnectivityManager mManager;
     private static NetworkInfo mNetInfo;
 
-    public static boolean checkNetwork(ConnectivityManager _manager, Context _context) {
+    public static boolean checkNetwork(ConnectivityManager _manager) {
 
         // put the connectivity manager into the mManager variable
         mManager = _manager;
@@ -31,7 +31,6 @@ public class VerifyConnection {
                 return false;
             }
         } else {
-            // TODO: Add an alert for people attempting to connect on a device that cannot connect
             return false;
         }
     }

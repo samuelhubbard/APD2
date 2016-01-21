@@ -19,4 +19,8 @@
 
     <string name="tracked_game">Game added!</string>
     <string name="failed_to_track_game">Something went wrong</string>
+
+    <string name="check_release_dates">Checking for updated release dates</string>
+    <string name="release_date_check_complete">Updated release dates</string>
+    <string name="release_date_check_failed">Update failed</string>
 </resources>

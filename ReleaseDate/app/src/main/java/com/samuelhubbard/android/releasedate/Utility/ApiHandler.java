@@ -446,4 +446,60 @@ public class ApiHandler {
 
         return null;
     }
+
+    public static String checkForUpdates(GameObject g) {
+        String urlString = URL_BASE + GAME_DETAIL + g.getGameId() + API_KEY + API_FORMAT;
+
+        try {
+            // cast the URL string into a URL
+            URL url = new URL(urlString);
+
+            // open the connection
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+            // connect to the server
+            connection.connect();
+
+            // start an input stream and put the contents into a string
+            InputStream gameStream = connection.getInputStream();
+            String data = IOUtils.toString(gameStream);
+
+            // close the stream and disconnect from the server
+            gameStream.close();
+            connection.disconnect();
+
+            // return the string that holds the JSON
+            return data;
+
+            // if there was an issue, print the stack trace
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // if there was an issue, return null
+        return null;
+    }
+
+    public static GameObject parseUpdateRequest(String s) {
+        try {
+            JSONObject data = new JSONObject(s);
+
+            JSONObject results = data.getJSONObject("results");
+
+            // get the release date and quarter in pieces
+            String day = results.getString("expected_release_day");
+            String month = results.getString("expected_release_month");
+            String year = results.getString("expected_release_year");
+
+            GameObject game = new GameObject("", "", day, month, year, "", "", "",
+                    "", "");
+
+            return game;
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 }

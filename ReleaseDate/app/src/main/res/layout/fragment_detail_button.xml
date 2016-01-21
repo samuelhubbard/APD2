@@ -4,7 +4,6 @@
     android:layout_height="match_parent">
 
     <TextView android:id="@+id/detail_all_purpose_button"
-        android:text="Track Game"
         android:background="@drawable/button_shape"
         android:textColor="@color/colorAccent"
         style="@style/Base.TextAppearance.AppCompat.Large"

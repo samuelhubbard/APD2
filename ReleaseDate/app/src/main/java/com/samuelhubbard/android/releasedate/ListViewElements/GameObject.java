@@ -133,6 +133,20 @@ public class GameObject implements Serializable {
         return mId;
     }
 
+    // setters
+
+    public void setDay(String day) {
+        this.mReleaseDay = day;
+    }
+
+    public void setMonth(String month) {
+        this.mReleaseMonth = month;
+    }
+
+    public void setYear(String year) {
+        this.mReleaseYear = year;
+    }
+
     // Section header identifier and setter
     public void setToSectionHeader()
     {

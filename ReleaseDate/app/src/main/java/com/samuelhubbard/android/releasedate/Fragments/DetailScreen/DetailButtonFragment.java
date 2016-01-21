@@ -24,6 +24,7 @@ public class DetailButtonFragment extends Fragment {
 
     public interface GameDetailActionInterface {
         void trackGame();
+        void removeGame();
     }
 
     public static DetailButtonFragment newInstance() {
@@ -51,20 +52,27 @@ public class DetailButtonFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void setButtonBehavior(boolean status) {
+        if (!status) {
+            mButton.setText("TRACK GAME");
+            mButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mInterface = (GameDetailActionInterface) getActivity();
 
-        // TODO: Deal with whether the game is already being tracked or not.
+                    mInterface.trackGame();
+                }
+            });
+        } else {
+            mButton.setText("REMOVE");
+            mButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mInterface = (GameDetailActionInterface) getActivity();
 
-        mButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // if the game is not being tracked...
-                mInterface = (GameDetailActionInterface) getActivity();
-
-                mInterface.trackGame();
-            }
-        });
+                    mInterface.removeGame();
+                }
+            });
+        }
     }
 }

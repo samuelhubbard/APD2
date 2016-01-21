@@ -26,15 +26,19 @@ import com.samuelhubbard.android.releasedate.Utility.ApiHandler;
 import com.samuelhubbard.android.releasedate.Utility.FileManager;
 import com.samuelhubbard.android.releasedate.Utility.VerifyConnection;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class UpcomingGameDetailActivity extends AppCompatActivity implements DetailButtonFragment.GameDetailActionInterface {
 
     String mGameId;
     GameObject mGame;
+    boolean mIsTracked;
 
     boolean mRunning = false;
     RetrieveGameInfo mBackgroundTask;
+    String mParentActivity;
 
 
     @Override
@@ -43,14 +47,14 @@ public class UpcomingGameDetailActivity extends AppCompatActivity implements Det
         setContentView(R.layout.activity_game_detail);
 
         Intent i = getIntent();
-        mGameId = i.getStringExtra("ID");
-        Log.i("TESTING", mGameId);
+        mParentActivity = i.getStringExtra("SENTFROM");
+        mIsTracked = i.getBooleanExtra("STATUS", false);
 
         // ensure the device is online
         ConnectivityManager manager = (ConnectivityManager)
                 getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        boolean isConnected = VerifyConnection.checkNetwork(manager, this);
+        boolean isConnected = VerifyConnection.checkNetwork(manager);
 
         if (savedInstanceState == null) {
             DetailImageFragment imageFrag = DetailImageFragment.newInstance();
@@ -78,25 +82,38 @@ public class UpcomingGameDetailActivity extends AppCompatActivity implements Det
                     .replace(R.id.detail_button_container, buttonFrag, DetailButtonFragment.TAG)
                     .commit();
 
-            if (isConnected) {
-                mBackgroundTask = new RetrieveGameInfo();
-                mBackgroundTask.execute();
+            if (Objects.equals(mParentActivity, "Upcoming")) {
+                mGameId = i.getStringExtra("ID");
+                if (isConnected) {
+                    mBackgroundTask = new RetrieveGameInfo();
+                    mBackgroundTask.execute();
+                } else {
+                    Toast.makeText(this, "No network connection", Toast.LENGTH_SHORT).show();
+                }
             } else {
-                Toast.makeText(this, "No network connection", Toast.LENGTH_SHORT).show();
+                mGame = (GameObject) i.getSerializableExtra("GAME");
+                if (mGame == null) {
+                    Log.i("TESTING", "Yep... it's null");
+                } else {
+                    Log.i("TESTING", "It has stuff.");
+                }
+                //populateScreen(mGame);
             }
         } else {
             ScrollView detailView = (ScrollView) findViewById(R.id.detail_view);
             detailView.setVisibility(View.VISIBLE);
 
-            if (mGame == null) {
-                if (mRunning) {
-                    mBackgroundTask.cancel(false);
-                    mBackgroundTask = null;
-                    mRunning = false;
-                }
+            if (Objects.equals(mParentActivity, "Upcoming")) {
+                if (mGame == null) {
+                    if (mRunning) {
+                        mBackgroundTask.cancel(false);
+                        mBackgroundTask = null;
+                        mRunning = false;
+                    }
 
-                mBackgroundTask = new RetrieveGameInfo();
-                mBackgroundTask.execute();
+                    mBackgroundTask = new RetrieveGameInfo();
+                    mBackgroundTask.execute();
+                }
             }
         }
     }
@@ -116,12 +133,12 @@ public class UpcomingGameDetailActivity extends AppCompatActivity implements Det
         if (mGame != null) {
             setTitle(mGame.getName());
             populateScreen(mGame);
+            Log.i("TESTING", "onPause");
         }
     }
 
     @Override
     public void trackGame() {
-        // TODO: Develop a method to save add chosen game to an array, save to file for tracked games screen
 
         boolean saveFile = FileManager.saveToFile(mGame, this);
 
@@ -129,6 +146,25 @@ public class UpcomingGameDetailActivity extends AppCompatActivity implements Det
             Toast.makeText(this, R.string.tracked_game, Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this, R.string.failed_to_track_game, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void removeGame() {
+        ArrayList<GameObject> array;
+
+        String filename = "trackedgames.bin";
+        array = FileManager.loadFromFile(new File(this.getFilesDir(), filename));
+
+        if (array != null) {
+            for (int i = 0; i < array.size(); i++) {
+                if (Objects.equals(array.get(i).getGameId(), mGame.getGameId())) {
+                    array.remove(i);
+                    FileManager.updateFile(array, this);
+                    finish();
+                    break;
+                }
+            }
         }
     }
 
@@ -196,9 +232,13 @@ public class UpcomingGameDetailActivity extends AppCompatActivity implements Det
             DetailDescriptionFragment descFrag = (DetailDescriptionFragment) getFragmentManager()
                     .findFragmentByTag(DetailDescriptionFragment.TAG);
 
+            DetailButtonFragment buttonFrag = (DetailButtonFragment) getFragmentManager()
+                    .findFragmentByTag(DetailButtonFragment.TAG);
+
             imageFrag.populateImage(game, this);
             coreFrag.populateCore(game);
             descFrag.populateSummary(game);
+            buttonFrag.setButtonBehavior(mIsTracked);
 
             ProgressBar detailProgress = (ProgressBar) findViewById(R.id.progress_detail);
             ScrollView detailView = (ScrollView) findViewById(R.id.detail_view);

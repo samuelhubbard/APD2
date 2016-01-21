@@ -18,14 +18,11 @@ import java.io.ObjectOutputStream;
 import java.io.OptionalDataException;
 import java.io.StreamCorruptedException;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class FileManager {
     public static boolean saveToFile(GameObject g, Context c) {
         try {
-//            File sdCard = Environment.getExternalStorageDirectory();
-//            File appDirectory = new File(sdCard, "ReleaseDate");
-//            appDirectory.mkdirs();
-//            File list = new File(appDirectory, "trackedgames.bin");
 
             ArrayList<GameObject> array;
 
@@ -67,6 +64,32 @@ public class FileManager {
         return false;
     }
 
+    public static boolean updateFile(ArrayList<GameObject> a, Context c) {
+        try {
+
+            String filename = "trackedgames.bin";
+            File file = new File(c.getFilesDir(), filename);
+
+            // defining the output stream
+            ObjectOutputStream outStream = new ObjectOutputStream(new FileOutputStream(file));
+
+            // writing to the file
+            outStream.writeObject(a);
+
+            // flushing and closing the stream
+            outStream.flush();
+            outStream.close();
+
+            return true;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
     public static ArrayList<GameObject> loadFromFile(File f) {
         try {
 
@@ -94,5 +117,37 @@ public class FileManager {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static boolean isTracked(File f, String id) {
+
+        try {
+            ArrayList<GameObject> array;
+            ObjectInputStream stream;
+
+            if (f.exists()) {
+                stream = new ObjectInputStream(new FileInputStream(f));
+                // saving the contents of the file to the array variable
+                array = (ArrayList<GameObject>) stream.readObject();
+
+                for (int i = 0; i < array.size(); i++) {
+                    if (Objects.equals(array.get(i).getGameId(), id)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (OptionalDataException e) {
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (StreamCorruptedException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }
