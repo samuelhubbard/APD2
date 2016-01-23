@@ -26,12 +26,14 @@ public class TrackedGamesFragment extends Fragment {
     // the fragment identification tag
     public static final String TAG = "TrackedGamesFragment.TAG";
 
+    // member variables
     private static ArrayList<GameObject> mArray;
     private TextView mNoTrackedGames;
     private ListView mTrackedGamesList;
     private ArrayList<GameObject> mFinalArray;
     private static Context mContext;
 
+    // interface variable
     private TrackedGamesInterface mInterface;
 
     public interface TrackedGamesInterface {
@@ -73,6 +75,7 @@ public class TrackedGamesFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        // set element visibility based on if there are any tracked games
         if (mArray == null) {
             mNoTrackedGames.setVisibility(View.VISIBLE);
             mTrackedGamesList.setVisibility(View.GONE);
@@ -80,31 +83,50 @@ public class TrackedGamesFragment extends Fragment {
             mNoTrackedGames.setVisibility(View.GONE);
             mTrackedGamesList.setVisibility(View.VISIBLE);
 
+            // update the list
             updateList(mArray);
 
         }
     }
 
+    // method that handles the list: sorts, adds section headers, and populates the list view
     public void updateList(ArrayList<GameObject> a) {
 
-        ArrayList<GameObject> sortedArray = SortTrackedGames.sortArray(a);
+        if (a != null) {
+            if (a.size() > 0) {
 
-        mFinalArray = SortTrackedGames.includeSectionHeaders(sortedArray);
+                // set necessary visibility
+                mNoTrackedGames.setVisibility(View.GONE);
+                mTrackedGamesList.setVisibility(View.VISIBLE);
 
-        TrackedGameListAdapter adapter = new TrackedGameListAdapter(mContext, mFinalArray);
+                // sort the array that is stored on device
+                ArrayList<GameObject> sortArray = SortTrackedGames.sortArray(a);
 
-        mTrackedGamesList.setAdapter(adapter);
+                mFinalArray = SortTrackedGames.includeSectionHeaders(sortArray);
 
-        mTrackedGamesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                GameObject game = (GameObject) parent.getAdapter().getItem(position);
+                // create the adapter
+                TrackedGameListAdapter adapter = new TrackedGameListAdapter(mContext, mFinalArray);
 
-                mInterface = (TrackedGamesInterface) getActivity();
+                // set the adapter
+                mTrackedGamesList.setAdapter(adapter);
 
-                mInterface.openDetails(game);
+                // set the listener for the list view elements
+                mTrackedGamesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        // get the position of cell clicked
+                        GameObject game = (GameObject) parent.getAdapter().getItem(position);
+
+                        // send the object to the main activity for detail view population
+                        mInterface = (TrackedGamesInterface) getActivity();
+                        mInterface.openDetails(game);
+                    }
+                });
+            } else {
+                mNoTrackedGames.setVisibility(View.VISIBLE);
+                mTrackedGamesList.setVisibility(View.GONE);
             }
-        });
+        }
 
     }
 }

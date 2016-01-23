@@ -11,11 +11,17 @@
     android:background="@color/colorPrimaryDark"
     tools:context="com.samuelhubbard.android.releasedate.TrackedGamesActivity">
 
-    <ProgressBar android:id="@+id/progress_detail"
-        android:layout_gravity="center"
+    <FrameLayout android:id="@+id/progress_detail"
         android:visibility="gone"
-        android:layout_width="80dp"
-        android:layout_height="80dp" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ProgressBar
+            android:layout_gravity="center"
+            android:layout_width="80dp"
+            android:layout_height="80dp" />
+
+    </FrameLayout>
 
     <ScrollView android:id="@+id/detail_view"
         android:fillViewport="true"

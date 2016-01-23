@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Objects;
@@ -233,54 +234,71 @@ public class ApiHandler {
             // time for array sorting
             ArrayList<GameListObject> sortedArray = new ArrayList<>();
 
-            // this for loop handles sorting by month
-            for (int i = 1; i <= 12; i++) {
-                ArrayList<GameListObject> monthArray = new ArrayList<>();
+            Calendar c = Calendar.getInstance();
+            int numericalYear = c.get(Calendar.YEAR);
+            int maxYearRange = numericalYear + 2;
 
-                // this nested for loop actually runs through the full array looking for everything
-                // corresponding to the month
-                for (int o = 0; o < workingArray.size(); o++) {
+            for (int t = numericalYear; t <= maxYearRange; t++) {
+                ArrayList<GameListObject> yearArray = new ArrayList<>();
 
-                    GameListObject game = workingArray.get(o);
-                    String month = game.getMonth();
-                    String stringMonth = String.valueOf(i);
+                for (int r = 0; r < workingArray.size(); r++) {
+                    GameListObject game = workingArray.get(r);
+                    String year = game.getReleaseYear();
+                    String stringYear = String.valueOf(t);
 
-                    // if the month is equal to the iterator for the initial for loop
-                    // add it to the working array
-                    if (Objects.equals(month, stringMonth)) {
-                        monthArray.add(game);
+                    if (Objects.equals(year, stringYear)) {
+                        yearArray.add(game);
                     }
                 }
+                // this for loop handles sorting by month
+                for (int i = 1; i <= 12; i++) {
+                    ArrayList<GameListObject> monthArray = new ArrayList<>();
 
-                // the for loop that handles sorting the new array by day
-                for (int p = 1; p <= 31; p++) {
-                    ArrayList<GameListObject> dayArray = new ArrayList<>();
+                    // this nested for loop actually runs through the full array looking for everything
+                    // corresponding to the month
+                    for (int o = 0; o < yearArray.size(); o++) {
 
-                    // this for loop sorts through the new array and sorts it again by day
-                    for (int u = 0; u < monthArray.size(); u++) {
+                        GameListObject game = yearArray.get(o);
+                        String month = game.getMonth();
+                        String stringMonth = String.valueOf(i);
 
-                        GameListObject game = monthArray.get(u);
-                        String day = game.getDay();
-                        String stringDay = String.valueOf(p);
-
-                        if (Objects.equals(day, stringDay)) {
-                            dayArray.add(game);
+                        // if the month is equal to the iterator for the initial for loop
+                        // add it to the working array
+                        if (Objects.equals(month, stringMonth)) {
+                            monthArray.add(game);
                         }
                     }
 
-                    // finally, take that array that is now sorted by month and day...
-                    // and sort it further, alphabetically by game name
-                    Collections.sort(dayArray, new Comparator<GameListObject>() {
-                        public int compare(GameListObject g1, GameListObject g2) {
-                            return g1.getName().compareTo(g2.getName());
+                    // the for loop that handles sorting the new array by day
+                    for (int p = 1; p <= 31; p++) {
+                        ArrayList<GameListObject> dayArray = new ArrayList<>();
+
+                        // this for loop sorts through the new array and sorts it again by day
+                        for (int u = 0; u < monthArray.size(); u++) {
+
+                            GameListObject game = monthArray.get(u);
+                            String day = game.getDay();
+                            String stringDay = String.valueOf(p);
+
+                            if (Objects.equals(day, stringDay)) {
+                                dayArray.add(game);
+                            }
                         }
-                    });
 
-                    // and put those contents into the array for return
-                    for (int y = 0; y < dayArray.size(); y++) {
+                        // finally, take that array that is now sorted by month and day...
+                        // and sort it further, alphabetically by game name
+                        Collections.sort(dayArray, new Comparator<GameListObject>() {
+                            public int compare(GameListObject g1, GameListObject g2) {
+                                return g1.getName().compareTo(g2.getName());
+                            }
+                        });
 
-                        GameListObject game = dayArray.get(y);
-                        sortedArray.add(game);
+                        // and put those contents into the array for return
+                        for (int y = 0; y < dayArray.size(); y++) {
+
+                            GameListObject game = dayArray.get(y);
+                            sortedArray.add(game);
+                        }
                     }
                 }
             }
@@ -477,29 +495,6 @@ public class ApiHandler {
         }
 
         // if there was an issue, return null
-        return null;
-    }
-
-    public static GameObject parseUpdateRequest(String s) {
-        try {
-            JSONObject data = new JSONObject(s);
-
-            JSONObject results = data.getJSONObject("results");
-
-            // get the release date and quarter in pieces
-            String day = results.getString("expected_release_day");
-            String month = results.getString("expected_release_month");
-            String year = results.getString("expected_release_year");
-
-            GameObject game = new GameObject("", "", day, month, year, "", "", "",
-                    "", "");
-
-            return game;
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
         return null;
     }
 }

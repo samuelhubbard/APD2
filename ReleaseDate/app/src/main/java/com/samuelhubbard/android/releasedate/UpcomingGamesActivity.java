@@ -5,6 +5,8 @@ package com.samuelhubbard.android.releasedate;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -12,7 +14,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.samuelhubbard.android.releasedate.Fragments.UpcomingFiltersFragment;
@@ -20,8 +21,10 @@ import com.samuelhubbard.android.releasedate.Fragments.UpcomingGamesFragment;
 import com.samuelhubbard.android.releasedate.ListViewElements.GameListObject;
 import com.samuelhubbard.android.releasedate.ListViewElements.SectionHeaderInclusion;
 import com.samuelhubbard.android.releasedate.Utility.ApiHandler;
+import com.samuelhubbard.android.releasedate.Utility.FileManager;
 import com.samuelhubbard.android.releasedate.Utility.VerifyConnection;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -149,9 +152,13 @@ public class UpcomingGamesActivity extends AppCompatActivity implements Upcoming
 
     @Override
     public void openGameDetails(String id) {
+        String filename = "trackedgames.bin";
+        boolean tracked = FileManager.isTracked(new File(this.getFilesDir(), filename), id);
+
         Intent i = new Intent(this, UpcomingGameDetailActivity.class);
         i.putExtra("ID", id);
         i.putExtra("SENTFROM", "Upcoming");
+        i.putExtra("STATUS", tracked);
         startActivity(i);
     }
 
@@ -164,8 +171,16 @@ public class UpcomingGamesActivity extends AppCompatActivity implements Upcoming
             // indicate that the thread is now active
             mRunning = true;
 
+            // lock the orientation for the async
+            int currentOrientation = getResources().getConfiguration().orientation;
+            if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+            } else {
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+            }
+
             // set the progress bar to visible and the two content fragments to gone
-            ProgressBar progress = (ProgressBar) findViewById(R.id.progress_indicator);
+            FrameLayout progress = (FrameLayout) findViewById(R.id.progress_indicator);
             progress.setVisibility(View.VISIBLE);
 
             FrameLayout filterContainer = (FrameLayout) findViewById(R.id.upcoming_filters_container);
@@ -209,8 +224,11 @@ public class UpcomingGamesActivity extends AppCompatActivity implements Upcoming
         protected void onPostExecute(ArrayList<GameListObject> array) {
             super.onPostExecute(array);
 
+            // unlock screen orientation changes
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+
             // progress bar gone, content fragments visible
-            ProgressBar progress = (ProgressBar) findViewById(R.id.progress_indicator);
+            FrameLayout progress = (FrameLayout) findViewById(R.id.progress_indicator);
             progress.setVisibility(View.GONE);
 
             FrameLayout filterContainer = (FrameLayout) findViewById(R.id.upcoming_filters_container);

@@ -106,10 +106,6 @@ public class GameListObject implements Serializable {
         return mReleaseYear;
     }
 
-    public String getReleaseQuarter() {
-        return mReleaseQuarter;
-    }
-
     public String getPlatforms() {
         return mPlatforms;
     }

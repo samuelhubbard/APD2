@@ -3,7 +3,10 @@
 
 package com.samuelhubbard.android.releasedate.ListViewElements;
 
+import android.util.Log;
+
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Objects;
@@ -14,58 +17,81 @@ public class SortTrackedGames {
         // time for array sorting
         ArrayList<GameObject> sortedArray = new ArrayList<>();
 
-        // this for loop handles sorting by month
-        for (int i = 1; i <= 12; i++) {
-            ArrayList<GameObject> monthArray = new ArrayList<>();
+        Calendar c = Calendar.getInstance();
+        int numericalYear = c.get(Calendar.YEAR);
+        Log.i("TESTING", String.valueOf(numericalYear));
+        int maxYearRange = numericalYear + 2;
+        Log.i("TESTING", String.valueOf(maxYearRange));
 
-            // this nested for loop actually runs through the full array looking for everything
-            // corresponding to the month
-            for (int o = 0; o < a.size(); o++) {
+        // this for loop handles sorting by year
+        for (int t = numericalYear; t <= maxYearRange; t++) {
+            ArrayList<GameObject> yearArray = new ArrayList<>();
 
-                GameObject game = a.get(o);
-                String month = game.getMonth();
-                String stringMonth = String.valueOf(i);
+            // loop through the entire array arranging all elements by year
+            for (int r = 0; r < a.size(); r++) {
+                GameObject game = a.get(r);
+                String year = game.getYear();
+                String stringYear = String.valueOf(t);
 
-                // if the month is equal to the iterator for the initial for loop
-                // add it to the working array
-                if (Objects.equals(month, stringMonth)) {
-                    monthArray.add(game);
+                if (Objects.equals(year, stringYear)) {
+                    yearArray.add(game);
                 }
             }
 
-            // the for loop that handles sorting the new array by day
-            for (int p = 1; p <= 31; p++) {
-                ArrayList<GameObject> dayArray = new ArrayList<>();
+            // this for loop handles sorting by month
+            for (int i = 1; i <= 12; i++) {
+                ArrayList<GameObject> monthArray = new ArrayList<>();
 
-                // this for loop sorts through the new array and sorts it again by day
-                for (int u = 0; u < monthArray.size(); u++) {
+                // this nested for loop actually runs through the full array looking for everything
+                // corresponding to the month
+                for (int o = 0; o < yearArray.size(); o++) {
 
-                    GameObject game = monthArray.get(u);
-                    String day = game.getDay();
-                    String stringDay = String.valueOf(p);
+                    GameObject game = yearArray.get(o);
+                    String month = game.getMonth();
+                    String stringMonth = String.valueOf(i);
 
-                    if (Objects.equals(day, stringDay)) {
-                        dayArray.add(game);
+                    // if the month is equal to the iterator for the initial for loop
+                    // add it to the working array
+                    if (Objects.equals(month, stringMonth)) {
+                        monthArray.add(game);
                     }
                 }
 
-                // finally, take that array that is now sorted by month and day...
-                // and sort it further, alphabetically by game name
-                Collections.sort(dayArray, new Comparator<GameObject>() {
-                    public int compare(GameObject g1, GameObject g2) {
-                        return g1.getName().compareTo(g2.getName());
+                // the for loop that handles sorting the new array by day
+                for (int p = 1; p <= 31; p++) {
+                    ArrayList<GameObject> dayArray = new ArrayList<>();
+
+                    // this for loop sorts through the new array and sorts it again by day
+                    for (int u = 0; u < monthArray.size(); u++) {
+
+                        GameObject game = monthArray.get(u);
+                        String day = game.getDay();
+                        String stringDay = String.valueOf(p);
+
+                        if (Objects.equals(day, stringDay)) {
+                            dayArray.add(game);
+                        }
                     }
-                });
 
-                // and put those contents into the array for return
-                for (int y = 0; y < dayArray.size(); y++) {
+                    // finally, take that array that is now sorted by month and day...
+                    // and sort it further, alphabetically by game name
+                    Collections.sort(dayArray, new Comparator<GameObject>() {
+                        public int compare(GameObject g1, GameObject g2) {
+                            return g1.getName().compareTo(g2.getName());
+                        }
+                    });
 
-                    GameObject game = dayArray.get(y);
-                    sortedArray.add(game);
+                    // and put those contents into the array for return
+                    for (int y = 0; y < dayArray.size(); y++) {
+
+                        GameObject game = dayArray.get(y);
+                        sortedArray.add(game);
+                    }
                 }
             }
         }
         return sortedArray;
+
     }
     
     public static ArrayList<GameObject> includeSectionHeaders(ArrayList<GameObject> a) {

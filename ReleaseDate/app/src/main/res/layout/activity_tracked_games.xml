@@ -8,7 +8,19 @@
     android:background="@color/colorPrimaryDark"
     tools:context="com.samuelhubbard.android.releasedate.TrackedGamesActivity">
 
+    <FrameLayout android:id="@+id/tracked_progress_bar"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ProgressBar
+            android:layout_gravity="center"
+            android:layout_width="80dp"
+            android:layout_height="80dp" />
+    </FrameLayout>
+
     <FrameLayout android:id="@+id/tracked_container"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

@@ -6,11 +6,16 @@
     android:orientation="horizontal"
     android:background="@color/colorPrimaryDark">
 
-    <ProgressBar android:id="@+id/progress_indicator"
-        android:layout_gravity="center"
+    <FrameLayout android:id="@+id/progress_indicator"
         android:visibility="gone"
-        android:layout_width="80dp"
-        android:layout_height="80dp" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ProgressBar
+            android:layout_gravity="center"
+            android:layout_width="80dp"
+            android:layout_height="80dp" />
+    </FrameLayout>
 
     <FrameLayout android:id="@+id/upcoming_filters_container"
         android:layout_width="0dp"

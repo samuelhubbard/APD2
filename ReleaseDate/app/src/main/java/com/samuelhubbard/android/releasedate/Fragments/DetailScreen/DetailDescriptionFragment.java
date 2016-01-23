@@ -16,8 +16,10 @@ import com.samuelhubbard.android.releasedate.R;
 
 public class DetailDescriptionFragment extends Fragment {
 
+    // fragment identification tag
     public static final String TAG = "DetailDescriptionFragment.TAG";
 
+    // member variable
     private TextView textSummary;
 
     public static DetailDescriptionFragment newInstance() {
@@ -36,6 +38,7 @@ public class DetailDescriptionFragment extends Fragment {
         return v;
     }
 
+    // populate fragment after data is present
     public void populateSummary(GameObject game) {
         textSummary.setText(game.getDescription());
     }

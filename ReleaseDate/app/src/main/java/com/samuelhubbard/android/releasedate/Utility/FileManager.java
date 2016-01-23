@@ -4,7 +4,6 @@
 package com.samuelhubbard.android.releasedate.Utility;
 
 import android.content.Context;
-import android.os.Environment;
 
 import com.samuelhubbard.android.releasedate.ListViewElements.GameObject;
 
@@ -126,10 +125,12 @@ public class FileManager {
             ObjectInputStream stream;
 
             if (f.exists()) {
+                // pull in the array
                 stream = new ObjectInputStream(new FileInputStream(f));
-                // saving the contents of the file to the array variable
                 array = (ArrayList<GameObject>) stream.readObject();
 
+                // loop through that array, checking to see if the id is present.
+                // if it is, return true
                 for (int i = 0; i < array.size(); i++) {
                     if (Objects.equals(array.get(i).getGameId(), id)) {
                         return true;

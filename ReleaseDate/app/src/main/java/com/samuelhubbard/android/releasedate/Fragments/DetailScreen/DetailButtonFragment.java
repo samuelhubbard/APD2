@@ -16,12 +16,14 @@ import com.samuelhubbard.android.releasedate.R;
 
 public class DetailButtonFragment extends Fragment {
 
+    // fragment identification tag
     public static final String TAG = "DetailButtonFragment.TAG";
 
+    // member variables
     private TextView mButton;
-
     private GameDetailActionInterface mInterface;
 
+    // button click interface
     public interface GameDetailActionInterface {
         void trackGame();
         void removeGame();
@@ -52,8 +54,10 @@ public class DetailButtonFragment extends Fragment {
         }
     }
 
+    // method that changes the button functionality
     public void setButtonBehavior(boolean status) {
         if (!status) {
+            // set button name and set the click to activate the interface based on the tracked boolean
             mButton.setText("TRACK GAME");
             mButton.setOnClickListener(new View.OnClickListener() {
                 @Override

@@ -5,7 +5,6 @@ package com.samuelhubbard.android.releasedate.Fragments.DetailScreen;
 
 import android.app.Fragment;
 import android.content.Context;
-import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -15,15 +14,16 @@ import android.widget.ImageView;
 
 import com.samuelhubbard.android.releasedate.ListViewElements.GameObject;
 import com.samuelhubbard.android.releasedate.R;
-import com.samuelhubbard.android.releasedate.Utility.VerifyConnection;
 import com.squareup.picasso.Picasso;
 
 import java.util.Objects;
 
 public class DetailImageFragment extends Fragment {
 
+    // fragment identification tag
     public static final String TAG = "DetailImageFragment.TAG";
 
+    // member variable
     private ImageView gameImage;
 
     public static DetailImageFragment newInstance() {
@@ -42,6 +42,7 @@ public class DetailImageFragment extends Fragment {
         return v;
     }
 
+    // populate image after data is present
     public void populateImage(GameObject game, Context c) {
 
         // run a check to see what came in

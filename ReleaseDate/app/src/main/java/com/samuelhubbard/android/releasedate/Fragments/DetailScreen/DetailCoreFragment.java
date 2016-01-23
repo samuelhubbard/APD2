@@ -9,7 +9,6 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.samuelhubbard.android.releasedate.ListViewElements.GameObject;
@@ -17,8 +16,10 @@ import com.samuelhubbard.android.releasedate.R;
 
 public class DetailCoreFragment extends Fragment {
 
+    // fragment identification tag
     public static final String TAG = "DetailCoreFragment.TAG";
 
+    // member variables
     public TextView textReleaseDate;
     public TextView textPlatforms;
     public TextView textDevelopers;
@@ -43,6 +44,7 @@ public class DetailCoreFragment extends Fragment {
         return v;
     }
 
+    // populate the fragment once data is present
     public void populateCore(GameObject game) {
         String releaseDay = "Releases on " + game.getFullReleaseDay();
         String platforms = "Platforms: " + game.getPlatforms();

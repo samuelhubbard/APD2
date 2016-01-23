@@ -78,15 +78,16 @@ public class UpcomingGamesFragment extends Fragment {
         // sets the list view to the custom adapter
         gameListView.setAdapter(gameListAdapter);
 
+        // click listener to open detail view from list view
         gameListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // get object position
                 GameListObject game = (GameListObject) parent.getAdapter().getItem(position);
 
+                // send object to activity for detail view population
                 mInterface = (UpcomingGamesInterface) getActivity();
-
                 mInterface.openGameDetails(game.getGameId());
-
             }
         });
 

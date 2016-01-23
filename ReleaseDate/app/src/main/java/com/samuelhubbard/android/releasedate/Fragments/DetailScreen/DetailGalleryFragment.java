@@ -14,6 +14,7 @@ import com.samuelhubbard.android.releasedate.R;
 
 public class DetailGalleryFragment extends Fragment {
 
+    // fragment identification tag
     public static final String TAG = "DetailGalleryFragment.TAG";
 
     public static DetailGalleryFragment newInstance() {
