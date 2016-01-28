@@ -6,6 +6,7 @@ package com.samuelhubbard.android.releasedate.Fragments;
 import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +22,8 @@ import java.util.ArrayList;
 import java.util.IllegalFormatCodePointException;
 
 public class UpcomingGamesFragment extends Fragment {
+
+    private Parcelable mState;
 
     // the fragment identification tag
     public static final String TAG = "UpcomingGamesFragment.TAG";
@@ -78,6 +81,10 @@ public class UpcomingGamesFragment extends Fragment {
         // sets the list view to the custom adapter
         gameListView.setAdapter(gameListAdapter);
 
+        if (mState != null) {
+            gameListView.onRestoreInstanceState(mState);
+        }
+
         // click listener to open detail view from list view
         gameListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -93,5 +100,10 @@ public class UpcomingGamesFragment extends Fragment {
 
     }
 
+    @Override
+    public void onPause() {
+        mState = gameListView.onSaveInstanceState();
 
+        super.onPause();
+    }
 }

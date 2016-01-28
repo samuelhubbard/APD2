@@ -11,6 +11,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.samuelhubbard.android.releasedate.R;
 import com.squareup.picasso.Picasso;
 
@@ -100,7 +102,8 @@ public class GameListAdapter extends BaseAdapter {
                 thumb.setImageResource(R.drawable.no_image);
             } else {
                 // Using Picasso to load in the game's thumbnail from the web
-                Picasso.with(mContext).load(game.getThumbnailPath()).resize(75, 100).placeholder(R.drawable.no_image).into(thumb);
+                Glide.with(mContext).load(game.getThumbnailPath()).diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .fitCenter().error(R.drawable.no_image).into(thumb);
             }
 
             // populate the text views

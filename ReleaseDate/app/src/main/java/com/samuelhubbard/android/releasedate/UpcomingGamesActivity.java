@@ -12,9 +12,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.Toast;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.samuelhubbard.android.releasedate.Fragments.UpcomingFiltersFragment;
 import com.samuelhubbard.android.releasedate.Fragments.UpcomingGamesFragment;
@@ -27,17 +29,23 @@ import com.samuelhubbard.android.releasedate.Utility.VerifyConnection;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Objects;
 
-public class UpcomingGamesActivity extends AppCompatActivity implements UpcomingGamesFragment.UpcomingGamesInterface {
+public class UpcomingGamesActivity extends AppCompatActivity implements UpcomingGamesFragment.UpcomingGamesInterface,
+        UpcomingFiltersFragment.FilterInterface {
 
     // variables for game retrieval
     String mYear;
     String mQuarterOne;
     String mQuarterTwo;
+    String mQuarterThree;
     ArrayList<GameListObject> mArray;
+    ArrayList<GameListObject> mFilteredArray;
+    String mCurrentFilter;
 
     // variables to handle the background thread
-    boolean mRunning;
+    boolean mRunning = false;
+    boolean mUpdated = false;
     RetrieveUpcomingGames mBackgroundThread;
 
     @Override
@@ -56,19 +64,23 @@ public class UpcomingGamesActivity extends AppCompatActivity implements Upcoming
         if (month >= 0 && month <= 2) {
             mQuarterOne = "1";
             mQuarterTwo = "2";
+            mQuarterThree = "3";
         } else if (month >= 3 && month <= 5) {
             mQuarterOne = "2";
             mQuarterTwo = "3";
+            mQuarterThree = "4";
         } else if (month >= 6 && month <= 8) {
             mQuarterOne = "3";
             mQuarterTwo = "4";
+            mQuarterThree = "1";
         } else if (month >= 9 && month <= 11) {
             mQuarterOne = "4";
             mQuarterTwo = "1";
+            mQuarterThree = "2";
         }
 
         // ensure the device is online
-        ConnectivityManager manager = (ConnectivityManager)
+        final ConnectivityManager manager = (ConnectivityManager)
                 getSystemService(Context.CONNECTIVITY_SERVICE);
 
         boolean isConnected = VerifyConnection.checkNetwork(manager);
@@ -88,14 +100,54 @@ public class UpcomingGamesActivity extends AppCompatActivity implements Upcoming
                     .replace(R.id.upcoming_games_container, listFrag, UpcomingGamesFragment.TAG)
                     .commit();
 
+            if (mCurrentFilter == null) {
+                mCurrentFilter = "all";
+
+                // link to the fragment
+                UpcomingFiltersFragment frag = (UpcomingFiltersFragment) getFragmentManager()
+                        .findFragmentByTag(UpcomingFiltersFragment.TAG);
+
+                // as long as the fragment isn't null
+                if (frag != null) {
+                    // populate the list
+                    frag.setActiveFilter(mCurrentFilter);
+                }
+            }
+
             // if there is a connection, start the background thread
             if (isConnected) {
                 mBackgroundThread = new RetrieveUpcomingGames();
                 mBackgroundThread.execute();
             } else {
-                Toast.makeText(this, "No network connection", Toast.LENGTH_SHORT).show();
+                FrameLayout progress = (FrameLayout) findViewById(R.id.progress_indicator);
+                progress.setVisibility(View.GONE);
+
+                FrameLayout filterContainer = (FrameLayout) findViewById(R.id.upcoming_filters_container);
+                filterContainer.setVisibility(View.GONE);
+
+                FrameLayout listContainer = (FrameLayout) findViewById(R.id.upcoming_games_container);
+                listContainer.setVisibility(View.GONE);
+
+                LinearLayout errorScreen = (LinearLayout) findViewById(R.id.upcoming_games_noconn);
+                errorScreen.setVisibility(View.VISIBLE);
+
+                TextView noConnButton = (TextView) findViewById(R.id.upcoming_games_noconn_button);
+                noConnButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        boolean isConnected = VerifyConnection.checkNetwork(manager);
+
+                        if (isConnected) {
+                            mBackgroundThread = new RetrieveUpcomingGames();
+                            mBackgroundThread.execute();
+                        }
+                    }
+                });
             }
         } else {
+            mRunning = savedInstanceState.getBoolean("RUNNING");
+            mUpdated = savedInstanceState.getBoolean("UPDATED");
+            Log.i("TESTING", "This was hit... " + String.valueOf(mUpdated));
             // pull the array from the savedinstancestate
             mArray = (ArrayList<GameListObject>) savedInstanceState.getSerializable("ARRAY");
             // link to the frame layouts and ensure they are visible
@@ -106,7 +158,7 @@ public class UpcomingGamesActivity extends AppCompatActivity implements Upcoming
             listContainer.setVisibility(View.VISIBLE);
 
             // if the array is empty
-            if (mArray.size() == 0) {
+            if (!mUpdated) {
                 // and the background thread is running
                 if (mRunning) {
                     // cancel the thread, nullify the thread, and indicate that the thread is no
@@ -129,24 +181,42 @@ public class UpcomingGamesActivity extends AppCompatActivity implements Upcoming
 
         // pull the array and boolean out of the savedinstance state when the state is restored
         mArray = (ArrayList<GameListObject>) savedInstanceState.getSerializable("ARRAY");
+        mFilteredArray = (ArrayList<GameListObject>) savedInstanceState.getSerializable("FILTERED");
         mRunning = savedInstanceState.getBoolean("RUNNING");
+        mUpdated = savedInstanceState.getBoolean("UPDATED");
+        mCurrentFilter = savedInstanceState.getString("FILTER");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
+        // link to the fragment
+        UpcomingGamesFragment f = (UpcomingGamesFragment) getFragmentManager()
+                .findFragmentByTag(UpcomingGamesFragment.TAG);
+
         // if the array isn't null
-        if (mArray != null) {
-            // link to the fragment
-            UpcomingGamesFragment f = (UpcomingGamesFragment) getFragmentManager()
-                    .findFragmentByTag(UpcomingGamesFragment.TAG);
+        if (mFilteredArray != null) {
 
             // as long as the fragment isn't null
             if (f != null) {
                 // populate the list
-                f.createList(this, mArray);
+                f.createList(this, mFilteredArray);
             }
+        } else if (mArray != null) {
+            if (f != null) {
+
+            }
+        }
+
+        // link to the fragment
+        UpcomingFiltersFragment frag = (UpcomingFiltersFragment) getFragmentManager()
+                .findFragmentByTag(UpcomingFiltersFragment.TAG);
+
+        // as long as the fragment isn't null
+        if (frag != null) {
+            // populate the list
+            frag.setActiveFilter(mCurrentFilter);
         }
     }
 
@@ -155,11 +225,112 @@ public class UpcomingGamesActivity extends AppCompatActivity implements Upcoming
         String filename = "trackedgames.bin";
         boolean tracked = FileManager.isTracked(new File(this.getFilesDir(), filename), id);
 
-        Intent i = new Intent(this, UpcomingGameDetailActivity.class);
+        Intent i = new Intent(this, GameDetailsActivity.class);
         i.putExtra("ID", id);
         i.putExtra("SENTFROM", "Upcoming");
         i.putExtra("STATUS", tracked);
         startActivity(i);
+    }
+
+    @Override
+    public void filterList(String platform) {
+        // setting up the member variables
+        mFilteredArray = new ArrayList<>();
+        mCurrentFilter = platform;
+
+        if (Objects.equals(platform, "all")) {
+            mFilteredArray = mArray;
+            mFilteredArray = SectionHeaderInclusion.insertHeaders(mFilteredArray);
+        } else if (Objects.equals(platform, "pc")) {
+            // instance variables
+            String filterProperty = "PC";
+            boolean filter;
+
+            // loop to filter
+            for (int i = 0; i < mArray.size(); i++) {
+                // check the platforms for the game
+                filter = mArray.get(i).getPlatforms().contains(filterProperty);
+
+                // if the game contains the filter property, add it to the filter array
+                if (filter) {
+                    mFilteredArray.add(mArray.get(i));
+                }
+            }
+
+            mFilteredArray = SectionHeaderInclusion.insertHeaders(mFilteredArray);
+        } else if (Objects.equals(platform, "ps4")) {
+            // instance variables
+            String filterProperty = "PlayStation 4";
+            boolean filter;
+
+            // loop to filter
+            for (int i = 0; i < mArray.size(); i++) {
+                // check the platforms for the game
+                filter = mArray.get(i).getPlatforms().contains(filterProperty);
+
+                // if the game contains the filter property, add it to the filter array
+                if (filter) {
+                    mFilteredArray.add(mArray.get(i));
+                }
+            }
+
+            mFilteredArray = SectionHeaderInclusion.insertHeaders(mFilteredArray);
+        } else if (Objects.equals(platform, "xbox")) {
+            // instance variables
+            String filterProperty = "Xbox One";
+            boolean filter;
+
+            // loop to filter
+            for (int i = 0; i < mArray.size(); i++) {
+                // check the platforms for the game
+                filter = mArray.get(i).getPlatforms().contains(filterProperty);
+
+                // if the game contains the filter property, add it to the filter array
+                if (filter) {
+                    mFilteredArray.add(mArray.get(i));
+                }
+            }
+
+            mFilteredArray = SectionHeaderInclusion.insertHeaders(mFilteredArray);
+        } else if (Objects.equals(platform, "wii")) {
+            // instance variables
+            String filterProperty = "Wii U";
+            boolean filter;
+
+            // loop to filter
+            for (int i = 0; i < mArray.size(); i++) {
+                // check the platforms for the game
+                filter = mArray.get(i).getPlatforms().contains(filterProperty);
+
+                // if the game contains the filter property, add it to the filter array
+                if (filter) {
+                    mFilteredArray.add(mArray.get(i));
+                }
+            }
+
+            mFilteredArray = SectionHeaderInclusion.insertHeaders(mFilteredArray);
+        }
+
+        // link to the fragment
+        UpcomingGamesFragment f = (UpcomingGamesFragment) getFragmentManager()
+                .findFragmentByTag(UpcomingGamesFragment.TAG);
+
+        // as long as the fragment isn't null
+        if (f != null) {
+            // populate the list
+            f.createList(UpcomingGamesActivity.this, mFilteredArray);
+        }
+
+        // link to the fragment
+        UpcomingFiltersFragment frag = (UpcomingFiltersFragment) getFragmentManager()
+                .findFragmentByTag(UpcomingFiltersFragment.TAG);
+
+        // as long as the fragment isn't null
+        if (frag != null) {
+            // populate the list
+            frag.setActiveFilter(mCurrentFilter);
+        }
+
     }
 
     private class RetrieveUpcomingGames extends AsyncTask<Void, Void, ArrayList<GameListObject>> {
@@ -188,6 +359,9 @@ public class UpcomingGamesActivity extends AppCompatActivity implements Upcoming
 
             FrameLayout listContainer = (FrameLayout) findViewById(R.id.upcoming_games_container);
             listContainer.setVisibility(View.GONE);
+
+            LinearLayout errorScreen = (LinearLayout) findViewById(R.id.upcoming_games_noconn);
+            errorScreen.setVisibility(View.GONE);
         }
 
         @Override
@@ -204,11 +378,14 @@ public class UpcomingGamesActivity extends AppCompatActivity implements Upcoming
                 // perform all of the required api calls for the timeframe requirement
                 String currentQuarterRawData = ApiHandler.retrieveUpcomingGames(mYear, mQuarterOne);
                 String nextQuarterRawData = ApiHandler.retrieveUpcomingGames(mYear, mQuarterTwo);
+                String thirdQuarterRawData = ApiHandler.retrieveUpcomingGames(mYear, mQuarterThree);
 
                 // as long as both api pulls were successful
-                if (currentQuarterRawData != null && nextQuarterRawData != null) {
+                if (currentQuarterRawData != null && nextQuarterRawData != null &&
+                        thirdQuarterRawData != null) {
                     // parse both of those into an array
-                    mArray = ApiHandler.parseUpcomingGames(currentQuarterRawData, nextQuarterRawData);
+                    mArray = ApiHandler.parseUpcomingGames(currentQuarterRawData, nextQuarterRawData,
+                            thirdQuarterRawData);
 
                     // if the array isn't empty, return it
                     if (mArray != null) {
@@ -237,8 +414,11 @@ public class UpcomingGamesActivity extends AppCompatActivity implements Upcoming
             FrameLayout listContainer = (FrameLayout) findViewById(R.id.upcoming_games_container);
             listContainer.setVisibility(View.VISIBLE);
 
+            // TODO: Add error handling here
+            mArray = array;
+
             // insert the headers into the array
-            mArray = SectionHeaderInclusion.insertHeaders(array);
+            mFilteredArray = SectionHeaderInclusion.insertHeaders(array);
 
             // link to the fragment
             UpcomingGamesFragment f = (UpcomingGamesFragment) getFragmentManager()
@@ -247,11 +427,12 @@ public class UpcomingGamesActivity extends AppCompatActivity implements Upcoming
             // as long as the fragment isn't null
             if (f != null) {
                 // populate the list
-                f.createList(UpcomingGamesActivity.this, mArray);
+                f.createList(UpcomingGamesActivity.this, mFilteredArray);
             }
 
             // indicate that the thread is no longer running
             mRunning = false;
+            mUpdated = true;
         }
     }
 
@@ -261,6 +442,9 @@ public class UpcomingGamesActivity extends AppCompatActivity implements Upcoming
 
         // save the array and running boolean to the outstate bundle
         outState.putSerializable("ARRAY", mArray);
+        outState.putSerializable("FILTERED", mFilteredArray);
         outState.putBoolean("RUNNING", mRunning);
+        outState.putBoolean("UPDATED", mUpdated);
+        outState.putString("FILTER", mCurrentFilter);
     }
 }

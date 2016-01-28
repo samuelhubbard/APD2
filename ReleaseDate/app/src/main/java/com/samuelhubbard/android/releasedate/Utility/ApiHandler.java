@@ -3,6 +3,8 @@
 
 package com.samuelhubbard.android.releasedate.Utility;
 
+import android.support.annotation.Nullable;
+
 import com.samuelhubbard.android.releasedate.ListViewElements.GameListObject;
 import com.samuelhubbard.android.releasedate.ListViewElements.GameObject;
 
@@ -37,6 +39,7 @@ public class ApiHandler {
     private static final String API_FILTER_YEAR = "expected_release_year:";
     private static final String API_FILTER_QUARTER = "expected_release_quarter:";
 
+    @Nullable
     public static String retrieveUpcomingGames(String year, String quarter) {
 
         // constructing the API Url
@@ -68,13 +71,12 @@ public class ApiHandler {
             // if there was an issue, print the stack trace
         } catch (IOException e) {
             e.printStackTrace();
+            return null;
         }
-
-        // if there was an issue, return null
-        return null;
     }
 
-    public static ArrayList<GameListObject> parseUpcomingGames(String current, String next) {
+    @Nullable
+    public static ArrayList<GameListObject> parseUpcomingGames(String current, String next, String third) {
 
         // create the array list to hold all of the game objects this parser creates
         ArrayList<GameListObject> workingArray = new ArrayList<>();
@@ -130,7 +132,7 @@ public class ApiHandler {
                 // as long as the image JSONObject isn't still null
                 if (image != null) {
                     // get the thumbnail url from the JSON
-                    thumbnail = image.getString("thumb_url");
+                    thumbnail = image.getString("medium_url");
                 } else {
                     // otherwise set it to "no_image" to eventually use a placeholder
                     thumbnail = "no_image";
@@ -204,7 +206,7 @@ public class ApiHandler {
                 // otherwise, set it to indicate that the placeholder needs to be loaded
                 String thumbnail;
                 if (image != null) {
-                    thumbnail = image.getString("thumb_url");
+                    thumbnail = image.getString("medium_url");
                 } else {
                     thumbnail = "no_image";
                 }
@@ -225,6 +227,77 @@ public class ApiHandler {
                 // if there is a full release date, populate the game object and save it to the array
                 if (!Objects.equals(day, "null") && !Objects.equals(month, "null") && !Objects.equals(year, "null")) {
                     GameListObject obj = new GameListObject(name, thumbnail, day, month, year, quarter, platforms, id);
+                    workingArray.add(obj);
+                }
+
+
+            }
+
+            // the JSON information for the second pulled quarter
+            JSONObject quarterThreeResponse = new JSONObject(third);
+
+            // the array that holds all of the game information
+            JSONArray quarterThreeResults = quarterThreeResponse.getJSONArray("results");
+
+            // the for loop that will populate the array with all of the game objects
+            for (int i = 0; i < quarterThreeResults.length(); i++) {
+                // create the object for the current game in the array
+                JSONObject gameObject = quarterThreeResults.getJSONObject(i);
+
+                // set the image jsonobject to null
+                JSONObject image = null;
+                // if the game objects image section isn't null...
+                if (!gameObject.isNull("image")) {
+                    // set the image jsonobject to the game's image section
+                    image = gameObject.getJSONObject("image");
+                }
+                // link into the platforms array
+                JSONArray jsonPlatforms = gameObject.getJSONArray("platforms");
+
+                // the string to hold all of the tracked platforms
+                String workingPlatforms = "";
+
+                // loop through the platforms array and pull out all of the platforms that apply
+                // to this app
+                for (int p = 0; p < jsonPlatforms.length(); p++) {
+                    JSONObject singlePlatform = jsonPlatforms.getJSONObject(p);
+
+                    if (Objects.equals(singlePlatform.getString("name"), "PC") ||
+                            Objects.equals(singlePlatform.getString("name"), "PlayStation 4") ||
+                            Objects.equals(singlePlatform.getString("name"), "Xbox One")) {
+                        workingPlatforms = workingPlatforms + singlePlatform.getString("name") + ", ";
+                    }
+                }
+
+                // get the game name
+                String name = gameObject.getString("name");
+
+                // if the image json object isn't null, set it to the game object's image section
+                // otherwise, set it to indicate that the placeholder needs to be loaded
+                String thumbnail;
+                if (image != null) {
+                    thumbnail = image.getString("medium_url");
+                } else {
+                    thumbnail = "no_image";
+                }
+
+                // get the release date and quarter in pieces
+                String day = gameObject.getString("expected_release_day");
+                String month = gameObject.getString("expected_release_month");
+                String year = gameObject.getString("expected_release_year");
+                String quarter = gameObject.getString("expected_release_quarter");
+
+                // remove all of the extra spaces and commas from the platform string
+                String platforms = workingPlatforms;
+                if (platforms.endsWith(", ")) {
+                    platforms = platforms.substring(0, platforms.length() - 2);
+                }
+                String id = gameObject.getString("id");
+
+                // if there is a full release date, populate the game object and save it to the array
+                if (!Objects.equals(day, "null") && !Objects.equals(month, "null") && !Objects.equals(year, "null")) {
+                    GameListObject obj = new GameListObject(name, thumbnail, day, month, year, quarter, platforms, id);
+
                     workingArray.add(obj);
                 }
 
@@ -306,14 +379,12 @@ public class ApiHandler {
 
         } catch (JSONException e) {
             e.printStackTrace();
+            return null;
         }
-
-        return null;
     }
 
+    @Nullable
     public static String retrieveGameDetail(String id) {
-
-        // http://www.giantbomb.com/api/game/" + selectedGame + "/?api_key=50e1bd0527eca552647ed32ebe50f7bb8ee0e89e&format=json
 
         String urlString = URL_BASE + GAME_DETAIL + id + API_KEY + API_FORMAT;
 
@@ -341,13 +412,12 @@ public class ApiHandler {
             // if there was an issue, print the stack trace
         } catch (IOException e) {
             e.printStackTrace();
+            return null;
         }
-
-        // if there was an issue, return null
-        return null;
 
     }
 
+    @Nullable
     public static GameObject parseGame(String raw) {
 
         try {
@@ -367,6 +437,7 @@ public class ApiHandler {
             JSONArray jsonPlatforms = results.getJSONArray("platforms");
             JSONArray jsonDevelopers = null;
             JSONArray jsonGenres = null;
+            JSONArray jsonImages = null;
 
             if (!results.isNull("genres")) {
                 jsonGenres = results.getJSONArray("genres");
@@ -374,6 +445,10 @@ public class ApiHandler {
 
             if (!results.isNull("developers")) {
                 jsonDevelopers = results.getJSONArray("developers");
+            }
+
+            if (!results.isNull("images")) {
+                jsonImages = results.getJSONArray("images");
             }
 
             // initialize the string that will hold all of the available platforms
@@ -404,6 +479,16 @@ public class ApiHandler {
                 }
             } else {
                 workingDevelopers = "No developers listed.";
+            }
+
+            ArrayList<String> images = new ArrayList<>();
+
+            if (jsonImages != null) {
+                for (int i = 0; i < jsonImages.length(); i++) {
+                    JSONObject singleImage = jsonImages.getJSONObject(i);
+
+                    images.add(singleImage.getString("medium_url"));
+                }
             }
 
             String workingGenres = "";
@@ -455,16 +540,16 @@ public class ApiHandler {
             String id = results.getString("id");
 
             GameObject game = new GameObject(name, description, day, month, year, platforms, detailImage, developers,
-                    genres, id);
+                    genres, id, images);
 
             return game;
         } catch (JSONException e) {
             e.printStackTrace();
+            return null;
         }
-
-        return null;
     }
 
+    @Nullable
     public static String checkForUpdates(GameObject g) {
         String urlString = URL_BASE + GAME_DETAIL + g.getGameId() + API_KEY + API_FORMAT;
 
@@ -492,9 +577,7 @@ public class ApiHandler {
             // if there was an issue, print the stack trace
         } catch (IOException e) {
             e.printStackTrace();
+            return null;
         }
-
-        // if there was an issue, return null
-        return null;
     }
 }

@@ -15,12 +15,27 @@
     <string name="detail_screen_summary_title">Summary</string>
     <string name="detail_screen_gallery_title">Images</string>
 
-    <string name="no_tracked_games">Not currently tracking and games.\nGo find some!</string>
+    <string name="no_tracked_games">Not currently tracking any games.\nGo find some!</string>
 
     <string name="tracked_game">Game added!</string>
     <string name="failed_to_track_game">Something went wrong</string>
+    <string name="removed_game">Game removed</string>
 
     <string name="check_release_dates">Checking for updated release dates</string>
     <string name="release_date_check_complete">Updated release dates</string>
     <string name="release_date_check_failed">Update failed</string>
+
+    <string name="filter_all">All</string>
+    <string name="filter_pc">PC</string>
+    <string name="filter_ps4">PS4</string>
+    <string name="filter_xbox">Xbox</string>
+    <string name="filter_wii">Wii</string>
+    <string name="title_activity_game_details">GameDetails</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="filters">Platform Filters</string>
+    <string name="upcoming_noconn">Unable to load upcoming games. - No internet connection.</string>
+    <string name="upcoming_noconn_button">Retry</string>
+
+    <string name="image_grid_noconn">Unable to load images. - No internet connection.</string>
 </resources>

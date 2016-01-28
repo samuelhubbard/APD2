@@ -4,6 +4,7 @@
 package com.samuelhubbard.android.releasedate.ListViewElements;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class GameObject implements Serializable {
 
@@ -21,6 +22,7 @@ public class GameObject implements Serializable {
     private String mDeveloper;
     private String mGenre;
     private String mId;
+    private ArrayList<String> mImages;
     private boolean isSectionHeader;
 
     // constructors
@@ -35,6 +37,7 @@ public class GameObject implements Serializable {
         mDeveloper = "";
         mGenre = "";
         mId = "";
+        mImages = null;
     }
 
     public GameObject(String name) {
@@ -100,6 +103,13 @@ public class GameObject implements Serializable {
         isSectionHeader = false;
     }
 
+    public GameObject(String name, String desc, String day, String month, String year, String platforms, String image,
+                      String dev, String genre, String id, ArrayList<String> images) {
+        this (name, desc, day, month, year, platforms, image, dev, genre, id);
+        mImages = images;
+        isSectionHeader = false;
+    }
+
     // get methods
     public String getName() {
         return mName;
@@ -131,6 +141,10 @@ public class GameObject implements Serializable {
 
     public String getGameId() {
         return mId;
+    }
+
+    public ArrayList<String> getImages() {
+        return mImages;
     }
 
     // setters

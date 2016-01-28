@@ -6,6 +6,7 @@ package com.samuelhubbard.android.releasedate.Fragments;
 import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -68,6 +69,8 @@ public class TrackedGamesFragment extends Fragment {
 
         if (context instanceof TrackedGamesInterface) {
             mInterface = (TrackedGamesInterface) getActivity();
+        } else {
+            throw new IllegalArgumentException("Interface must be an instance of the context.");
         }
     }
 

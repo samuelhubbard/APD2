@@ -13,9 +13,4 @@
         android:id="@+id/action_about"
         android:orderInCategory="101"
         app:showAsAction="never" />
-
-    <item android:title="Test Notification"
-        android:id="@+id/action_test"
-        android:orderInCategory="102"
-        app:showAsAction="never" />
 </menu>

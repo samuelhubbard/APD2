@@ -14,7 +14,7 @@ public class NotificationReceiver extends BroadcastReceiver {
         // if the device just restarted
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
             // start the service to check for updates
-            Intent bootIntent = new Intent(context, NotificationService.class);
+            Intent bootIntent = new Intent(context, BootService.class);
             context.startService(bootIntent);
         // if the intent action is a notification that needs to be displayed
         } else if (intent.getAction().equals("com.samuelhubbard.android.releasedate.ShowNotification")) {
@@ -24,6 +24,9 @@ public class NotificationReceiver extends BroadcastReceiver {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        } else if (intent.getAction().equals("com.samuelhubbard.android.releasedate.RunUpdates")) {
+            Intent updateIntent = new Intent(context, UpdateService.class);
+            context.startService(updateIntent);
         }
 
     }

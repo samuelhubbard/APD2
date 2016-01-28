@@ -17,10 +17,11 @@ import com.samuelhubbard.android.releasedate.ListViewElements.GameObject;
 import com.samuelhubbard.android.releasedate.R;
 import com.samuelhubbard.android.releasedate.TrackedGamesActivity;
 
+import java.util.Random;
+
 public class NotificationHandler {
 
     // member variables
-    private static final int NOTIFICATION_ID = 1;
     private static NotificationManager notificationManager;
     private static PendingIntent pendingIntent;
 
@@ -49,8 +50,11 @@ public class NotificationHandler {
         builder.setSound(alarmSound);
         builder.setContentIntent(pendingIntent);
 
+        Random random = new Random();
+        int notificationId = random.nextInt(9999 - 1000) + 1000;
+
         // apply the build and show it
         notificationManager = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(NOTIFICATION_ID, builder.build());
+        notificationManager.notify(notificationId, builder.build());
     }
 }
