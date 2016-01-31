@@ -12,7 +12,6 @@ import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.support.v7.app.NotificationCompat;
-import android.util.Log;
 
 import com.samuelhubbard.android.releasedate.ListViewElements.GameObject;
 import com.samuelhubbard.android.releasedate.R;
@@ -34,7 +33,6 @@ public class UpdateService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Log.i("TESTING", "Update service started.");
         ArrayList<GameObject> mList;
         ArrayList<GameObject> updateArray;
 
@@ -110,16 +108,10 @@ public class UpdateService extends IntentService {
                     }
                 }
 
-                // TODO: Save the file
                 // save those updates
                 boolean saveUpdates = FileManager.updateFile(mList, UpdateService.this);
-            } else {
-                Log.i("TESTING", "Update service stopped - updateArray returned null.");
             }
-        } else {
-            Log.i("TESTING", "Update service stopped - No file.");
         }
-        Log.i("TESTING", "Update service stopped - Complete with no errors.");
         stopSelf();
     }
 
@@ -145,17 +137,12 @@ public class UpdateService extends IntentService {
 
                         if (game != null) {
                             updateArray.add(game);
-                        } else {
-                            Log.i("TESTING", "Update service stopped - Problem parsing.");
                         }
-                    } else {
-                        Log.i("TESTING", "Update service stopped - API pull failed.");
                     }
                 }
             }
             return updateArray;
         } else {
-            Log.i("TESTING", "Update service stopped - No connection.");
             return null;
         }
     }

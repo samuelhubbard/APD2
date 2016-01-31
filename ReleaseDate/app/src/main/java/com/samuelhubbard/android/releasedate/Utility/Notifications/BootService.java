@@ -15,7 +15,6 @@ import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.support.v7.app.NotificationCompat;
-import android.util.Log;
 
 import com.samuelhubbard.android.releasedate.ListViewElements.GameObject;
 import com.samuelhubbard.android.releasedate.R;
@@ -37,7 +36,6 @@ public class BootService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Log.i("TESTING", "Boot service started.");
         ArrayList<GameObject> mList;
         ArrayList<GameObject> updateArray;
 
@@ -49,8 +47,8 @@ public class BootService extends IntentService {
             updateArray = pullUpdates(mList);
 
             if (updateArray != null && updateArray.size() > 0) {
-                // cross reference arrays to check for updates
 
+                // cross reference arrays to check for updates
                 for (int i = 0; i < updateArray.size(); i++) {
                     if (!Objects.equals(mList.get(i).getMonth(), updateArray.get(i).getMonth()) ||
                             !Objects.equals(mList.get(i).getDay(), updateArray.get(i).getDay()) ||
@@ -118,11 +116,7 @@ public class BootService extends IntentService {
 
                 // save those updates
                 boolean saveUpdates = FileManager.updateFile(mList, BootService.this);
-            } else {
-                Log.i("TESTING", "Boot service stopped - updateArray returned null.");
             }
-        } else {
-            Log.i("TESTING", "Boot service stopped - No file.");
         }
 
         Intent i = new Intent(this, NotificationReceiver.class);
@@ -136,7 +130,6 @@ public class BootService extends IntentService {
         AlarmManager checkUpdatesAlarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
         checkUpdatesAlarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, updateCalendar.getTimeInMillis(),
                 AlarmManager.INTERVAL_DAY, p);
-        Log.i("TESTING", "Boot service stopped - Complete with no errors.");
         stopSelf();
 
     }
@@ -164,18 +157,15 @@ public class BootService extends IntentService {
                         if (game != null) {
                             updateArray.add(game);
                         } else {
-                            Log.i("TESTING", "Boot service stopped - Problem parsing.");
                             return null;
                         }
                     } else {
-                        Log.i("TESTING", "Boot service stopped - API pull failed.");
                         return null;
                     }
                 }
             }
             return updateArray;
         } else {
-            Log.i("TESTING", "Boot service stopped - No connection.");
             return null;
         }
     }

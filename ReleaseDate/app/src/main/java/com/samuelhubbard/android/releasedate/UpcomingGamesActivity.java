@@ -12,16 +12,17 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.samuelhubbard.android.releasedate.Fragments.UpcomingFiltersFragment;
 import com.samuelhubbard.android.releasedate.Fragments.UpcomingGamesFragment;
 import com.samuelhubbard.android.releasedate.ListViewElements.GameListObject;
 import com.samuelhubbard.android.releasedate.ListViewElements.SectionHeaderInclusion;
+import com.samuelhubbard.android.releasedate.Utility.AddMultipleGamesService;
 import com.samuelhubbard.android.releasedate.Utility.ApiHandler;
 import com.samuelhubbard.android.releasedate.Utility.FileManager;
 import com.samuelhubbard.android.releasedate.Utility.VerifyConnection;
@@ -110,7 +111,7 @@ public class UpcomingGamesActivity extends AppCompatActivity implements Upcoming
                 // as long as the fragment isn't null
                 if (frag != null) {
                     // populate the list
-                    frag.setActiveFilter(mCurrentFilter);
+                    frag.setActiveFilter(mCurrentFilter, this);
                 }
             }
 
@@ -147,7 +148,6 @@ public class UpcomingGamesActivity extends AppCompatActivity implements Upcoming
         } else {
             mRunning = savedInstanceState.getBoolean("RUNNING");
             mUpdated = savedInstanceState.getBoolean("UPDATED");
-            Log.i("TESTING", "This was hit... " + String.valueOf(mUpdated));
             // pull the array from the savedinstancestate
             mArray = (ArrayList<GameListObject>) savedInstanceState.getSerializable("ARRAY");
             // link to the frame layouts and ensure they are visible
@@ -203,10 +203,6 @@ public class UpcomingGamesActivity extends AppCompatActivity implements Upcoming
                 // populate the list
                 f.createList(this, mFilteredArray);
             }
-        } else if (mArray != null) {
-            if (f != null) {
-
-            }
         }
 
         // link to the fragment
@@ -216,8 +212,19 @@ public class UpcomingGamesActivity extends AppCompatActivity implements Upcoming
         // as long as the fragment isn't null
         if (frag != null) {
             // populate the list
-            frag.setActiveFilter(mCurrentFilter);
+            frag.setActiveFilter(mCurrentFilter, this);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (mRunning) {
+            mBackgroundThread.cancel(false);
+            mBackgroundThread = null;
+            mRunning = false;
+        }
+
+        super.onDestroy();
     }
 
     @Override
@@ -230,6 +237,18 @@ public class UpcomingGamesActivity extends AppCompatActivity implements Upcoming
         i.putExtra("SENTFROM", "Upcoming");
         i.putExtra("STATUS", tracked);
         startActivity(i);
+    }
+
+    @Override
+    public void addMultipleGames(ArrayList<GameListObject> a) {
+        // create the intent, apply the action, input the extras, and start the service
+        Intent i = new Intent(this, AddMultipleGamesService.class);
+        i.setAction("com.samuelhubbard.android.releasedate.AddMultipleGames");
+        i.putExtra("GAMES", a);
+        startService(i);
+
+        // notify that games are being added
+        Toast.makeText(this, R.string.adding_games, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -328,7 +347,7 @@ public class UpcomingGamesActivity extends AppCompatActivity implements Upcoming
         // as long as the fragment isn't null
         if (frag != null) {
             // populate the list
-            frag.setActiveFilter(mCurrentFilter);
+            frag.setActiveFilter(mCurrentFilter, this);
         }
 
     }
@@ -414,25 +433,27 @@ public class UpcomingGamesActivity extends AppCompatActivity implements Upcoming
             FrameLayout listContainer = (FrameLayout) findViewById(R.id.upcoming_games_container);
             listContainer.setVisibility(View.VISIBLE);
 
-            // TODO: Add error handling here
-            mArray = array;
+            if (array != null) {
+                mArray = array;
 
-            // insert the headers into the array
-            mFilteredArray = SectionHeaderInclusion.insertHeaders(array);
+                // insert the headers into the array
+                mFilteredArray = SectionHeaderInclusion.insertHeaders(array);
 
-            // link to the fragment
-            UpcomingGamesFragment f = (UpcomingGamesFragment) getFragmentManager()
-                    .findFragmentByTag(UpcomingGamesFragment.TAG);
+                // link to the fragment
+                UpcomingGamesFragment f = (UpcomingGamesFragment) getFragmentManager()
+                        .findFragmentByTag(UpcomingGamesFragment.TAG);
 
-            // as long as the fragment isn't null
-            if (f != null) {
-                // populate the list
-                f.createList(UpcomingGamesActivity.this, mFilteredArray);
+                // as long as the fragment isn't null
+                if (f != null) {
+                    // populate the list
+                    f.createList(UpcomingGamesActivity.this, mFilteredArray);
+                }
+                // indicate that the data pull was successful
+                mUpdated = true;
             }
 
             // indicate that the thread is no longer running
             mRunning = false;
-            mUpdated = true;
         }
     }
 

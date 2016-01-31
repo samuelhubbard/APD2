@@ -20,6 +20,7 @@ import com.samuelhubbard.android.releasedate.Utility.Notifications.NotificationR
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Objects;
 
 public class TrackedGamesActivity extends AppCompatActivity implements TrackedGamesFragment.TrackedGamesInterface {
 
@@ -35,21 +36,22 @@ public class TrackedGamesActivity extends AppCompatActivity implements TrackedGa
         String filename = "trackedgames.bin";
         mList = FileManager.loadFromFile(new File(this.getFilesDir(), filename));
 
-        // hang the fragment
         if (savedInstanceState == null) {
             Intent i = new Intent(this, NotificationReceiver.class);
             i.setAction("com.samuelhubbard.android.releasedate.RunUpdates");
             PendingIntent p = PendingIntent.getBroadcast(this, 404, i, PendingIntent.FLAG_UPDATE_CURRENT);
 
+            // set the time for the update service to start
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(System.currentTimeMillis());
             calendar.set(Calendar.HOUR_OF_DAY, 20);
 
+            // setup the alarm and apply it to the OS
             AlarmManager checkUpdatesAlarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
             checkUpdatesAlarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                     AlarmManager.INTERVAL_DAY, p);
 
-
+            // hang the fragment
             TrackedGamesFragment trackedFrag = TrackedGamesFragment.newInstance(mList, this);
             getFragmentManager().beginTransaction()
                     .replace(R.id.tracked_container, trackedFrag, TrackedGamesFragment.TAG)
@@ -115,6 +117,45 @@ public class TrackedGamesActivity extends AppCompatActivity implements TrackedGa
         startActivity(i);
     }
 
+    @Override
+    public void removeMultipleGames(ArrayList<GameObject> a) {
+        final ArrayList<GameObject> array = a;
+
+        for (int i = 0; i < array.size(); i++) {
+            GameObject game;
+            // first for loop
+            // starts with the selections array, sets an element from it
+            game = array.get(i);
+
+            // loops through the official tracked list
+            // if anything matches, remove the notification and object from array for file
+            for (int u = 0; u < mList.size(); u++) {
+                if (Objects.equals(mList.get(u).getGameId(), game.getGameId())) {
+                    int id = Integer.parseInt(mList.get(u).getGameId());
+
+                    // create the intent and pending intent to cancel the alarm
+                    Intent cancelIntent = new Intent(TrackedGamesActivity.this, NotificationReceiver.class);
+                    cancelIntent.setAction("com.samuelhubbard.android.releasedate.ShowNotification");
+                    cancelIntent.putExtra("GAME", mList.get(u));
+                    PendingIntent pendingIntent = PendingIntent.getBroadcast(TrackedGamesActivity.this, id, cancelIntent,
+                            PendingIntent.FLAG_UPDATE_CURRENT);
+
+                    // create the alarm (cancellation) and send it to the OS
+                    AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+                    alarmManager.cancel(pendingIntent);
+
+                    // remove that game from the new array
+                    mList.remove(u);
+                }
+            }
+        }
+
+        // update the file
+        FileManager.updateFile(mList, TrackedGamesActivity.this);
+
+        updateListView();
+    }
+
     protected void updateListView() {
         // create an instance of the fragment
         TrackedGamesFragment f = (TrackedGamesFragment) getFragmentManager()
@@ -122,11 +163,11 @@ public class TrackedGamesActivity extends AppCompatActivity implements TrackedGa
 
         // pull in file
         String filename = "trackedgames.bin";
-        ArrayList<GameObject> list = FileManager.loadFromFile(new File(this.getFilesDir(), filename));
+        mList = FileManager.loadFromFile(new File(this.getFilesDir(), filename));
 
         // as long as the array isn't null, update the listview
         if (f != null) {
-            f.updateList(list);
+            f.updateList(mList, this);
         }
     }
 
@@ -137,5 +178,4 @@ public class TrackedGamesActivity extends AppCompatActivity implements TrackedGa
 
         super.onSaveInstanceState(outState);
     }
-
 }

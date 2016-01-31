@@ -62,6 +62,7 @@
 
         <service android:name=".Utility.Notifications.BootService" />
         <service android:name=".Utility.Notifications.UpdateService" />
+        <service android:name=".Utility.AddMultipleGamesService" />
 
     </application>
 

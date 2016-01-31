@@ -148,7 +148,6 @@ public class GameObject implements Serializable {
     }
 
     // setters
-
     public void setDay(String day) {
         this.mReleaseDay = day;
     }

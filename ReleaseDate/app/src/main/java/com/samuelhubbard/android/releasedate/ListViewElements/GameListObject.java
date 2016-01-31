@@ -16,7 +16,6 @@ public class GameListObject implements Serializable {
     private String mReleaseDay;
     private String mReleaseMonth;
     private String mReleaseYear;
-    private String mReleaseQuarter;
     private String mPlatforms;
     private String mId;
     private boolean isSectionHeader;
@@ -28,7 +27,6 @@ public class GameListObject implements Serializable {
         mReleaseDay = "";
         mReleaseMonth = "";
         mReleaseYear = "";
-        mReleaseQuarter = "";
         mPlatforms = "";
         mId = "";
     }
@@ -63,20 +61,14 @@ public class GameListObject implements Serializable {
         isSectionHeader = false;
     }
 
-    public GameListObject(String name, String thumb, String day, String month, String year, String quarter) {
+    public GameListObject(String name, String thumb, String day, String month, String year, String platforms) {
         this(name, thumb, day, month, year);
-        mReleaseQuarter = quarter;
-        isSectionHeader = false;
-    }
-
-    public GameListObject(String name, String thumb, String day, String month, String year, String quarter, String platforms) {
-        this(name, thumb, day, month, year, quarter);
         mPlatforms = platforms;
         isSectionHeader = false;
     }
 
-    public GameListObject(String name, String thumb, String day, String month, String year, String quarter, String platforms, String id) {
-        this(name, thumb, day, month, year, quarter, platforms);
+    public GameListObject(String name, String thumb, String day, String month, String year, String platforms, String id) {
+        this(name, thumb, day, month, year, platforms);
         mId = id;
         isSectionHeader = false;
     }

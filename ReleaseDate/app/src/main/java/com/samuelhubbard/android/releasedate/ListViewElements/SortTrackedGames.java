@@ -3,7 +3,6 @@
 
 package com.samuelhubbard.android.releasedate.ListViewElements;
 
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -19,9 +18,7 @@ public class SortTrackedGames {
 
         Calendar c = Calendar.getInstance();
         int numericalYear = c.get(Calendar.YEAR);
-        Log.i("TESTING", String.valueOf(numericalYear));
         int maxYearRange = numericalYear + 2;
-        Log.i("TESTING", String.valueOf(maxYearRange));
 
         // this for loop handles sorting by year
         for (int t = numericalYear; t <= maxYearRange; t++) {

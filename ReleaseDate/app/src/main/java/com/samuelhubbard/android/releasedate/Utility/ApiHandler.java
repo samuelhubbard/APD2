@@ -158,7 +158,7 @@ public class ApiHandler {
                 // check to make sure that there is a full release date
                 // if there is, create the game object and add it to the array
                 if (!Objects.equals(day, "null") && !Objects.equals(month, "null") && !Objects.equals(year, "null")) {
-                    GameListObject obj = new GameListObject(name, thumbnail, day, month, year, quarter, platforms, id);
+                    GameListObject obj = new GameListObject(name, thumbnail, day, month, year, platforms, id);
                     workingArray.add(obj);
                 }
             }
@@ -226,7 +226,7 @@ public class ApiHandler {
 
                 // if there is a full release date, populate the game object and save it to the array
                 if (!Objects.equals(day, "null") && !Objects.equals(month, "null") && !Objects.equals(year, "null")) {
-                    GameListObject obj = new GameListObject(name, thumbnail, day, month, year, quarter, platforms, id);
+                    GameListObject obj = new GameListObject(name, thumbnail, day, month, year, platforms, id);
                     workingArray.add(obj);
                 }
 
@@ -296,7 +296,7 @@ public class ApiHandler {
 
                 // if there is a full release date, populate the game object and save it to the array
                 if (!Objects.equals(day, "null") && !Objects.equals(month, "null") && !Objects.equals(year, "null")) {
-                    GameListObject obj = new GameListObject(name, thumbnail, day, month, year, quarter, platforms, id);
+                    GameListObject obj = new GameListObject(name, thumbnail, day, month, year, platforms, id);
 
                     workingArray.add(obj);
                 }

@@ -25,6 +25,7 @@ import java.util.ArrayList;
 
 public class GameImagesFragment extends Fragment {
 
+    // member variables
     private GridView mGrid;
     private GalleryAdapter mAdapter;
     private GameObject mGame;
@@ -32,13 +33,16 @@ public class GameImagesFragment extends Fragment {
     private Context mContext;
     private GameGridInterface mInterface;
     private TextView mNoConn;
+    private boolean mIsConnected;
 
+    // public constructor
     public GameImagesFragment() {
 
     }
 
+    // interface to open an image
     public interface GameGridInterface {
-        void sendImageAddress(String address);
+        void sendImageAddress(int position, ArrayList<String> array);
     }
 
     @Nullable
@@ -53,29 +57,77 @@ public class GameImagesFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        // instantiate the views for the grid and no connection
         mGrid = (GridView) getView().findViewById(R.id.game_grid);
         mNoConn = (TextView) getView().findViewById(R.id.image_grid_noconn_link);
 
+        // run a check to see if the device is connected
         ConnectivityManager manager = (ConnectivityManager)
                 getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        boolean isConnected = VerifyConnection.checkNetwork(manager);
+        mIsConnected = VerifyConnection.checkNetwork(manager);
 
+        // handle how to populate the game data
         if (savedInstanceState == null) {
             mGame = GameDetailsActivity.mGame;
         } else {
             mGame = (GameObject) savedInstanceState.getSerializable("GAME");
         }
 
-        if (isConnected) {
+        // handle behavior based on device network connection
+        if (mIsConnected) {
             if (mGame != null) {
+                // instantiate the array, context, and adapter
                 mImageArray = mGame.getImages();
                 mContext = GameDetailsActivity.mContext;
-
                 mAdapter = new GalleryAdapter(mContext, R.layout.grid_item_layout, mImageArray);
 
+                // set the adapter to the gridview
                 mGrid.setAdapter(mAdapter);
 
+                // set the click listener to open the large image viewer
+                mGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                        // incase the interface has dropped
+                        if (mInterface == null) {
+                            mInterface = (GameGridInterface) getActivity();
+                        }
+                        mInterface.sendImageAddress(position, mImageArray);
+                    }
+                });
+                // set window visibility
+                mGrid.setVisibility(View.VISIBLE);
+                mNoConn.setVisibility(View.GONE);
+            }
+        } else {
+            // set window visibility
+            mGrid.setVisibility(View.GONE);
+            mNoConn.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public void populate(GameObject game) {
+        // update the game data
+        mGame = game;
+
+        ConnectivityManager manager = (ConnectivityManager)
+                getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        mIsConnected = VerifyConnection.checkNetwork(manager);
+
+        if (mIsConnected) {
+            if (mGame != null) {
+                // instantiate the array, context, and adapter
+                mImageArray = mGame.getImages();
+                mContext = GameDetailsActivity.mContext;
+                mAdapter = new GalleryAdapter(mContext, R.layout.grid_item_layout, mImageArray);
+
+                // set the adapter to the gridview
+                mGrid.setAdapter(mAdapter);
+
+                // set a click listener to open the image viewer
                 mGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -84,49 +136,24 @@ public class GameImagesFragment extends Fragment {
                             mInterface = (GameGridInterface) getActivity();
                         }
 
-                        String imageAddress = parent.getItemAtPosition(position).toString();
-                        mInterface.sendImageAddress(imageAddress);
+                        mInterface.sendImageAddress(position, mImageArray);
                     }
                 });
+
+                // set window visibility
                 mGrid.setVisibility(View.VISIBLE);
                 mNoConn.setVisibility(View.GONE);
             }
         } else {
+            // set window visibility
             mGrid.setVisibility(View.GONE);
             mNoConn.setVisibility(View.VISIBLE);
         }
     }
 
-    public void populate(GameObject game) {
-        mGame = game;
-
-        if (mGame != null) {
-            mImageArray = mGame.getImages();
-            mContext = GameDetailsActivity.mContext;
-
-            mAdapter = new GalleryAdapter(mContext, R.layout.grid_item_layout, mImageArray);
-
-            mGrid.setAdapter(mAdapter);
-
-            mGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                    if (mInterface == null) {
-                        mInterface = (GameGridInterface) getActivity();
-                    }
-
-                    String imageAddress = parent.getItemAtPosition(position).toString();
-                    mInterface.sendImageAddress(imageAddress);
-                }
-            });
-
-            mGrid.setVisibility(View.VISIBLE);
-        }
-    }
-
     @Override
     public void onSaveInstanceState(Bundle outState) {
+        // saved the game data to the instance state
         outState.putSerializable("GAME", mGame);
 
         super.onSaveInstanceState(outState);
@@ -134,7 +161,8 @@ public class GameImagesFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        mGrid.setVisibility(View.GONE);
+        // remove the grid
+        mGrid = null;
         super.onDestroy();
     }
 }

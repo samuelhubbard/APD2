@@ -11,16 +11,18 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.samuelhubbard.android.releasedate.R;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
 public class GalleryAdapter extends ArrayAdapter<String> {
+    // member variables
     private Context mContext;
     private int layoutResourceId;
     private ArrayList<String> mGridData = new ArrayList<>();
 
+    // public constructor
     public GalleryAdapter(Context mContext, int layoutResourceId, ArrayList<String> data) {
         super(mContext, layoutResourceId, data);
         this.layoutResourceId = layoutResourceId;
@@ -30,20 +32,31 @@ public class GalleryAdapter extends ArrayAdapter<String> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        // instance variables
         View row = convertView;
         ViewHolder holder;
+
         if (row == null) {
+            // inflate the row
             LayoutInflater inflater = ((Activity) mContext).getLayoutInflater();
             row = inflater.inflate(layoutResourceId, parent, false);
+
+            // create a new view holder
             holder = new ViewHolder();
+            // set the image view of the holder
             holder.imageView = (ImageView) row.findViewById(R.id.grid_image);
+
+            // set the row tag
             row.setTag(holder);
         } else {
             holder = (ViewHolder) row.getTag();
         }
-        Picasso.with(mContext).load(mGridData.get(position)).into(holder.imageView);
+        // load in the image to the current image view based on position
+        Glide.with(mContext).load(mGridData.get(position)).into(holder.imageView);
         return row;
     }
+
+    // view holder class
     static class ViewHolder {
         ImageView imageView;
     }

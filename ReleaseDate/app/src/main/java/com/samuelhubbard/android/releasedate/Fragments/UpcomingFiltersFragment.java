@@ -5,7 +5,6 @@ package com.samuelhubbard.android.releasedate.Fragments;
 
 import android.app.Fragment;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -73,6 +72,7 @@ public class UpcomingFiltersFragment extends Fragment implements View.OnClickLis
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        // set the click listeners for the filter buttons
         filterAll.setOnClickListener(this);
         filterPC.setOnClickListener(this);
         filterPS4.setOnClickListener(this);
@@ -83,10 +83,12 @@ public class UpcomingFiltersFragment extends Fragment implements View.OnClickLis
     @Override
     public void onClick(View v) {
 
+        // incase there was a state change
         if (mInterface == null) {
             mInterface = (FilterInterface) getActivity();
         }
 
+        // send which button was clicked to the activity
         switch (v.getId()){
             case R.id.filter_all:
                 mInterface.filterList("all");
@@ -110,16 +112,16 @@ public class UpcomingFiltersFragment extends Fragment implements View.OnClickLis
         }
     }
 
-    public void setActiveFilter(String current) {
-        //TODO: Add the functionality to change button display
+    public void setActiveFilter(String current, Context c) {
 
-        // now, change the active filter
+        // Update filter button appearance based on active filter
+        // getColor is depreciated but, calling in the theme requires SDK 23
         if (Objects.equals(current, "all")) {
-            filterAll.setBackground(getResources().getDrawable(R.drawable.active_button_shape));
-            filterPC.setBackground(getResources().getDrawable(R.drawable.button_shape));
-            filterPS4.setBackground(getResources().getDrawable(R.drawable.button_shape));
-            filterXbox.setBackground(getResources().getDrawable(R.drawable.button_shape));
-            filterWii.setBackground(getResources().getDrawable(R.drawable.button_shape));
+            filterAll.setBackground(getResources().getDrawable(R.drawable.active_button_shape, c.getTheme()));
+            filterPC.setBackground(getResources().getDrawable(R.drawable.button_shape, c.getTheme()));
+            filterPS4.setBackground(getResources().getDrawable(R.drawable.button_shape, c.getTheme()));
+            filterXbox.setBackground(getResources().getDrawable(R.drawable.button_shape, c.getTheme()));
+            filterWii.setBackground(getResources().getDrawable(R.drawable.button_shape, c.getTheme()));
 
             filterAll.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
             filterPC.setTextColor(getResources().getColor(R.color.colorAccent));
@@ -127,11 +129,11 @@ public class UpcomingFiltersFragment extends Fragment implements View.OnClickLis
             filterXbox.setTextColor(getResources().getColor(R.color.colorAccent));
             filterWii.setTextColor(getResources().getColor(R.color.colorAccent));
         } else if (Objects.equals(current, "pc")) {
-            filterAll.setBackground(getResources().getDrawable(R.drawable.button_shape));
-            filterPC.setBackground(getResources().getDrawable(R.drawable.active_button_shape));
-            filterPS4.setBackground(getResources().getDrawable(R.drawable.button_shape));
-            filterXbox.setBackground(getResources().getDrawable(R.drawable.button_shape));
-            filterWii.setBackground(getResources().getDrawable(R.drawable.button_shape));
+            filterAll.setBackground(getResources().getDrawable(R.drawable.button_shape, c.getTheme()));
+            filterPC.setBackground(getResources().getDrawable(R.drawable.active_button_shape, c.getTheme()));
+            filterPS4.setBackground(getResources().getDrawable(R.drawable.button_shape, c.getTheme()));
+            filterXbox.setBackground(getResources().getDrawable(R.drawable.button_shape, c.getTheme()));
+            filterWii.setBackground(getResources().getDrawable(R.drawable.button_shape, c.getTheme()));
 
             filterAll.setTextColor(getResources().getColor(R.color.colorAccent));
             filterPC.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
@@ -139,11 +141,11 @@ public class UpcomingFiltersFragment extends Fragment implements View.OnClickLis
             filterXbox.setTextColor(getResources().getColor(R.color.colorAccent));
             filterWii.setTextColor(getResources().getColor(R.color.colorAccent));
         } else if (Objects.equals(current, "ps4")) {
-            filterAll.setBackground(getResources().getDrawable(R.drawable.button_shape));
-            filterPC.setBackground(getResources().getDrawable(R.drawable.button_shape));
-            filterPS4.setBackground(getResources().getDrawable(R.drawable.active_button_shape));
-            filterXbox.setBackground(getResources().getDrawable(R.drawable.button_shape));
-            filterWii.setBackground(getResources().getDrawable(R.drawable.button_shape));
+            filterAll.setBackground(getResources().getDrawable(R.drawable.button_shape, c.getTheme()));
+            filterPC.setBackground(getResources().getDrawable(R.drawable.button_shape, c.getTheme()));
+            filterPS4.setBackground(getResources().getDrawable(R.drawable.active_button_shape, c.getTheme()));
+            filterXbox.setBackground(getResources().getDrawable(R.drawable.button_shape, c.getTheme()));
+            filterWii.setBackground(getResources().getDrawable(R.drawable.button_shape, c.getTheme()));
 
             filterAll.setTextColor(getResources().getColor(R.color.colorAccent));
             filterPC.setTextColor(getResources().getColor(R.color.colorAccent));
@@ -151,11 +153,11 @@ public class UpcomingFiltersFragment extends Fragment implements View.OnClickLis
             filterXbox.setTextColor(getResources().getColor(R.color.colorAccent));
             filterWii.setTextColor(getResources().getColor(R.color.colorAccent));
         } else if (Objects.equals(current, "xbox")) {
-            filterAll.setBackground(getResources().getDrawable(R.drawable.button_shape));
-            filterPC.setBackground(getResources().getDrawable(R.drawable.button_shape));
-            filterPS4.setBackground(getResources().getDrawable(R.drawable.button_shape));
-            filterXbox.setBackground(getResources().getDrawable(R.drawable.active_button_shape));
-            filterWii.setBackground(getResources().getDrawable(R.drawable.button_shape));
+            filterAll.setBackground(getResources().getDrawable(R.drawable.button_shape, c.getTheme()));
+            filterPC.setBackground(getResources().getDrawable(R.drawable.button_shape, c.getTheme()));
+            filterPS4.setBackground(getResources().getDrawable(R.drawable.button_shape, c.getTheme()));
+            filterXbox.setBackground(getResources().getDrawable(R.drawable.active_button_shape, c.getTheme()));
+            filterWii.setBackground(getResources().getDrawable(R.drawable.button_shape, c.getTheme()));
 
             filterAll.setTextColor(getResources().getColor(R.color.colorAccent));
             filterPC.setTextColor(getResources().getColor(R.color.colorAccent));
@@ -163,11 +165,11 @@ public class UpcomingFiltersFragment extends Fragment implements View.OnClickLis
             filterXbox.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
             filterWii.setTextColor(getResources().getColor(R.color.colorAccent));
         } else if (Objects.equals(current, "wii")) {
-            filterAll.setBackground(getResources().getDrawable(R.drawable.button_shape));
-            filterPC.setBackground(getResources().getDrawable(R.drawable.button_shape));
-            filterPS4.setBackground(getResources().getDrawable(R.drawable.button_shape));
-            filterXbox.setBackground(getResources().getDrawable(R.drawable.button_shape));
-            filterWii.setBackground(getResources().getDrawable(R.drawable.active_button_shape));
+            filterAll.setBackground(getResources().getDrawable(R.drawable.button_shape, c.getTheme()));
+            filterPC.setBackground(getResources().getDrawable(R.drawable.button_shape, c.getTheme()));
+            filterPS4.setBackground(getResources().getDrawable(R.drawable.button_shape, c.getTheme()));
+            filterXbox.setBackground(getResources().getDrawable(R.drawable.button_shape, c.getTheme()));
+            filterWii.setBackground(getResources().getDrawable(R.drawable.active_button_shape, c.getTheme()));
 
             filterAll.setTextColor(getResources().getColor(R.color.colorAccent));
             filterPC.setTextColor(getResources().getColor(R.color.colorAccent));

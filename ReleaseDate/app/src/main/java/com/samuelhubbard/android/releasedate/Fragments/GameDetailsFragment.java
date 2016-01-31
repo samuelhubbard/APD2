@@ -14,15 +14,17 @@ import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.samuelhubbard.android.releasedate.GameDetailsActivity;
 import com.samuelhubbard.android.releasedate.ListViewElements.GameObject;
 import com.samuelhubbard.android.releasedate.R;
-import com.squareup.picasso.Picasso;
 
 import java.util.Objects;
 
 public class GameDetailsFragment extends Fragment {
 
+    // member variables
     private static TextView mButton;
     private static TextView textReleaseDate;
     private static TextView textPlatforms;
@@ -35,10 +37,12 @@ public class GameDetailsFragment extends Fragment {
     private static DetailInterface mInterface;
     private static ScrollView mScrollView;
 
+    // public constructor
     public GameDetailsFragment(){
 
     }
 
+    // tracking handling
     public interface DetailInterface {
         void trackGame();
         void removeGame();
@@ -56,6 +60,7 @@ public class GameDetailsFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        // instantiate all UI elements
         mScrollView = (ScrollView) getView().findViewById(R.id.detail_view);
         mButton = (TextView) getView().findViewById(R.id.details_all_purpose_button);
         textReleaseDate = (TextView) getView().findViewById(R.id.details_release_date);
@@ -65,9 +70,11 @@ public class GameDetailsFragment extends Fragment {
         textSummary = (TextView) getView().findViewById(R.id.details_summary);
         gameImage = (ImageView) getView().findViewById(R.id.tabbed_image);
 
+        // pull in activity context
         Context c = GameDetailsActivity.mContext;
 
         if (savedInstanceState == null) {
+            // pull in game and tracked status
             mGame = GameDetailsActivity.mGame;
             mStatus = GameDetailsActivity.mStatus;
         } else {
@@ -75,6 +82,7 @@ public class GameDetailsFragment extends Fragment {
             mStatus = savedInstanceState.getBoolean("STATUS");
         }
 
+        // set track handling button
         if (!mStatus) {
             // set button name and set the click to activate the interface based on the tracked boolean
             mButton.setText("TRACK GAME");
@@ -100,33 +108,40 @@ public class GameDetailsFragment extends Fragment {
 
         if (mGame != null) {
 
+            // set the strings for the UI
             String releaseDay = "Releases on " + mGame.getFullReleaseDay();
             String developers = "Developers: " + mGame.getDeveloper();
             String genres = "Genre: " + mGame.getGenre();
 
+            // set the text view data
             textReleaseDate.setText(releaseDay);
             textPlatforms.setText(mGame.getPlatforms());
             textDevelopers.setText(developers);
             textGenres.setText(genres);
             textSummary.setText(mGame.getDescription());
+
             // run a check to see what came in
             if (Objects.equals(mGame.getImage(), "no_image")) {
                 // no image from api, load the placeholder
                 gameImage.setImageResource(R.drawable.no_image);
             } else {
                 // Using Picasso to load in the game's thumbnail from the web
-                Picasso.with(c).load(mGame.getImage()).resize(125, 200).placeholder(R.drawable.no_image).into(gameImage);
+                Glide.with(c).load(mGame.getImage()).diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .fitCenter().error(R.drawable.no_image).into(gameImage);
             }
+            // set the view to be visible
             mScrollView.setVisibility(View.VISIBLE);
         }
     }
 
     public void populate(GameObject game, boolean status, Context c) {
+        // update the game data and tracked status
         mGame = game;
         mStatus = status;
 
         if (mGame != null) {
 
+            // set track handling button
             if (!mStatus) {
                 // set button name and set the click to activate the interface based on the tracked boolean
                 mButton.setText("TRACK GAME");
@@ -150,30 +165,37 @@ public class GameDetailsFragment extends Fragment {
                 });
             }
 
+            // set strings for UI population
             String releaseDay = "Releases on " + mGame.getFullReleaseDay();
             String developers = "Developers: " + mGame.getDeveloper();
             String genres = "Genre: " + mGame.getGenre();
 
+            // set textview data
             textReleaseDate.setText(releaseDay);
             textPlatforms.setText(mGame.getPlatforms());
             textDevelopers.setText(developers);
             textGenres.setText(genres);
             textSummary.setText(mGame.getDescription());
+
             // run a check to see what came in
             if (Objects.equals(mGame.getImage(), "no_image")) {
                 // no image from api, load the placeholder
                 gameImage.setImageResource(R.drawable.no_image);
             } else {
-                // Using Picasso to load in the game's thumbnail from the web
-                Picasso.with(c).load(mGame.getImage()).resize(125, 200).placeholder(R.drawable.no_image).into(gameImage);
+                // Using Glide to load in the game's thumbnail from the web
+                Glide.with(c).load(game.getImage()).diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .fitCenter().error(R.drawable.no_image).into(gameImage);
             }
+            // make it all visible
             mScrollView.setVisibility(View.VISIBLE);
         }
     }
 
     public void updateButtonBehavior(boolean status) {
+        // bring in the new track handling button status
         mStatus = status;
 
+        // set the button
         if (!mStatus) {
             // set button name and set the click to activate the interface based on the tracked boolean
             mButton.setText("TRACK GAME");
@@ -200,6 +222,7 @@ public class GameDetailsFragment extends Fragment {
 
     @Override
      public void onSaveInstanceState(Bundle outState) {
+        // save the game data and track handling button status
         outState.putSerializable("GAME", mGame);
         outState.putBoolean("STATUS", mStatus);
 
@@ -208,6 +231,7 @@ public class GameDetailsFragment extends Fragment {
 
     @Override
     public void onDestroy() {
+        // make the view disappear
         mScrollView.setVisibility(View.GONE);
         super.onDestroy();
     }

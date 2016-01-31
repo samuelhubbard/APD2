@@ -17,7 +17,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.ViewTreeObserver;
 import android.widget.Toast;
@@ -38,6 +37,7 @@ import java.util.Objects;
 public class GameDetailsActivity extends AppCompatActivity implements GameDetailsFragment.DetailInterface,
         GameImagesFragment.GameGridInterface {
 
+    // member variables
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
     public static GameObject mGame;
@@ -50,6 +50,7 @@ public class GameDetailsActivity extends AppCompatActivity implements GameDetail
     public static String mSentFrom;
     private RetrieveGameInfo mBackgroundTask;
 
+    // fragments
     private GameDetailsFragment mDetailsFragment = new GameDetailsFragment();
     private GameImagesFragment mImagesFragment = new GameImagesFragment();
 
@@ -58,8 +59,7 @@ public class GameDetailsActivity extends AppCompatActivity implements GameDetail
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_details);
 
-        //TODO: This seriously needs some connection checks
-
+        // check for network connection
         ConnectivityManager manager = (ConnectivityManager)
                 getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -76,7 +76,6 @@ public class GameDetailsActivity extends AppCompatActivity implements GameDetail
             } else {
                 if (mIsConnected) {
                     mGameId = i.getStringExtra("ID");
-                    Log.i("TESTING", mGameId);
                     mBackgroundTask = new RetrieveGameInfo();
                     mBackgroundTask.execute();
                 } else {
@@ -87,11 +86,13 @@ public class GameDetailsActivity extends AppCompatActivity implements GameDetail
             mGame = (GameObject) savedInstanceState.getSerializable("GAME");
         }
 
+        // create the toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -100,9 +101,11 @@ public class GameDetailsActivity extends AppCompatActivity implements GameDetail
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
+        // Set up the TabLayout
         final TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
+        // add padding to the views based on tab layout height
         ViewTreeObserver vto = tabLayout.getViewTreeObserver();
         vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -111,11 +114,11 @@ public class GameDetailsActivity extends AppCompatActivity implements GameDetail
             }
         });
 
-
+        // if there is game data present, set the title and set the tracked status
         if (mGame != null) {
             setTitle(mGame.getName());
             String filename = "trackedgames.bin";
-            mStatus = FileManager.isTracked(new File(GameDetailsActivity.this.getFilesDir(), filename), mGame.getGameId());;
+            mStatus = FileManager.isTracked(new File(GameDetailsActivity.this.getFilesDir(), filename), mGame.getGameId());
         }
 
     }
@@ -140,7 +143,6 @@ public class GameDetailsActivity extends AppCompatActivity implements GameDetail
             Toast.makeText(this, R.string.tracked_game, Toast.LENGTH_SHORT).show();
 
             mStatus = true;
-            // TODO: setup button behavior
             mDetailsFragment.updateButtonBehavior(mStatus);
 
             // setting up to create the alarm for notification
@@ -219,6 +221,7 @@ public class GameDetailsActivity extends AppCompatActivity implements GameDetail
                     if (Objects.equals(mSentFrom, "Tracked")) {
                         finish();
                     } else {
+                        // set tracked handling button status and update it
                         mStatus = false;
                         mDetailsFragment.updateButtonBehavior(mStatus);
                         Toast.makeText(this, R.string.removed_game, Toast.LENGTH_SHORT).show();
@@ -229,10 +232,12 @@ public class GameDetailsActivity extends AppCompatActivity implements GameDetail
         }
     }
 
+    // open the image viewer
     @Override
-    public void sendImageAddress(String address) {
+    public void sendImageAddress(int position, ArrayList<String> array) {
         Intent i = new Intent(this, DetailImageView.class);
-        i.putExtra("ADDRESS", address);
+        i.putExtra("POSITION", position);
+        i.putExtra("ARRAY", mGame.getImages());
         i.putExtra("TITLE", mGame.getName());
         startActivity(i);
     }
@@ -240,14 +245,19 @@ public class GameDetailsActivity extends AppCompatActivity implements GameDetail
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
+
+        // restore the game data and button status
         mGame = (GameObject) savedInstanceState.getSerializable("GAME");
         mStatus = savedInstanceState.getBoolean("STATUS");
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+
+        // save the game data and button status
         outState.putSerializable("GAME", mGame);
         outState.putBoolean("STATUS", mStatus);
+
         super.onSaveInstanceState(outState);
     }
 
@@ -261,6 +271,7 @@ public class GameDetailsActivity extends AppCompatActivity implements GameDetail
         public Fragment getItem(int position) {
             Fragment fragment = null;
 
+            // set which fragments are associated which tab
             switch (position) {
                 case 0:
                     fragment = mDetailsFragment;
@@ -279,6 +290,7 @@ public class GameDetailsActivity extends AppCompatActivity implements GameDetail
 
         @Override
         public CharSequence getPageTitle(int position) {
+            // set the tab titles
             switch (position) {
                 case 0:
                     return "Details";
@@ -295,6 +307,7 @@ public class GameDetailsActivity extends AppCompatActivity implements GameDetail
         protected void onPreExecute() {
             super.onPreExecute();
 
+            // lock the current orientation for the background task
             int currentOrientation = getResources().getConfiguration().orientation;
             if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
@@ -342,7 +355,6 @@ public class GameDetailsActivity extends AppCompatActivity implements GameDetail
                 // populate the screen
                 setTitle(game.getName());
                 populateScreen(game);
-                Log.i("TESTING", "Async task worked");
 
             }
 
@@ -354,12 +366,14 @@ public class GameDetailsActivity extends AppCompatActivity implements GameDetail
 
     @Override
     protected void onDestroy() {
+        // nullify the game data and game id
         mGame = null;
         mGameId = null;
         super.onDestroy();
     }
 
     public void populateScreen(GameObject game) {
+        // populate the UI
         mDetailsFragment.populate(game, mStatus, GameDetailsActivity.this);
         mImagesFragment.populate(game);
     }

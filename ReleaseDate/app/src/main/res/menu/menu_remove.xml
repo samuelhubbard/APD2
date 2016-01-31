@@ -3,14 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.samuelhubbard.android.releasedate.TrackedGamesActivity">
 
-    <item android:title="Upcoming Games"
-        android:id="@+id/action_upcoming"
-        android:icon="@drawable/ic_action_upcoming"
+    <item android:title="Delete"
+        android:id="@+id/action_delete"
+        android:icon="@drawable/ic_remove_circle_outline_white_24dp"
         android:orderInCategory="100"
         app:showAsAction="ifRoom" />
-
-    <item android:title="About"
-        android:id="@+id/action_about"
-        android:orderInCategory="101"
-        app:showAsAction="never" />
 </menu>
