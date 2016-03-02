@@ -48,24 +48,31 @@ public class BootService extends IntentService {
 
             if (updateArray != null && updateArray.size() > 0) {
 
+                int arrayPosition = 0;
+                while (arrayPosition < updateArray.size()) {
+                    if (Objects.equals(updateArray.get(arrayPosition).getDay(), "null") ||
+                            Objects.equals(updateArray.get(arrayPosition).getMonth(), "null") ||
+                            Objects.equals(updateArray.get(arrayPosition).getYear(), "null")) {
+
+                        String removalTitle = mList.get(arrayPosition).getName();
+                        String removalContent = "Game has released! Removed from your tracked games.";
+                        sendNotification(removalTitle, removalContent);
+
+                        // remove the game from the tracked list
+                        mList.remove(arrayPosition);
+                        updateArray.remove(arrayPosition);
+                        arrayPosition--;
+                    }
+
+                    arrayPosition++;
+                }
+
                 // cross reference arrays to check for updates
                 for (int i = 0; i < updateArray.size(); i++) {
                     if (!Objects.equals(mList.get(i).getMonth(), updateArray.get(i).getMonth()) ||
                             !Objects.equals(mList.get(i).getDay(), updateArray.get(i).getDay()) ||
                             !Objects.equals(mList.get(i).getYear(), updateArray.get(i).getYear())) {
 
-                        if (Objects.equals(updateArray.get(i).getDay(), "null") &&
-                                Objects.equals(updateArray.get(i).getMonth(), "null") &&
-                                Objects.equals(updateArray.get(i).getYear(), "null")) {
-
-                            String removalTitle = mList.get(i).getName();
-                            String removalContent = "Game has released! Removed from your tracked games.";
-                            sendNotification(removalTitle, removalContent);
-
-                            // remove the game from the tracked list
-                            mList.remove(i);
-                            updateArray.remove(i);
-                        }
                         // update the app file
                         mList.get(i).setDay(updateArray.get(i).getDay());
                         mList.get(i).setMonth(updateArray.get(i).getMonth());
@@ -115,7 +122,7 @@ public class BootService extends IntentService {
                 }
 
                 // save those updates
-                boolean saveUpdates = FileManager.updateFile(mList, BootService.this);
+                boolean saveUpdates = FileManager.updateFile(updateArray, BootService.this);
             }
         }
 
